@@ -1,8 +1,23 @@
 import prisma from "@/app/libs/prismadb";
 
-export default async function getListing() {
+export interface IListingsParams {
+    userId?: string;
+}
+
+export default async function getListing(
+    params: IListingsParams
+) {
     try {
+        const { userId } = params;
+
+        let query = {};
+
+        if (userId) {
+            query.userId = userId;
+        }
+
         const listings = await prisma.listing.findMany({
+            where: query,
             orderBy: {
                 createdAt: 'desc'
             }
