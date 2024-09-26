@@ -10,6 +10,7 @@ import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
 
 import { Safelisting, SafeUser } from "../types";
+import useRentModal from "../hooks/useRentModal";
 
 interface PropertiesClientProps {
     listings: Safelisting[];
@@ -21,9 +22,11 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
     currentUser
 }) => {
     const router = useRouter();
+    const rentModal = useRentModal();
     const [deletingId, setDeletingId] = useState('');
+    const [updatingId, setUpdatingId] = useState('');
 
-    const onCancel = useCallback((id: string) => {
+    const onDelete = useCallback((id: string) => {
         setDeletingId(id);
 
         axios.delete(`/api/listings/${id}`)
@@ -38,6 +41,13 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
             setDeletingId('');
         });
     }, [router]);
+
+    const onUpdate = useCallback((id: string) => {
+        const listingToUpdate = listings.find(listing => listing.id === id); // Tìm listing theo id
+        if (listingToUpdate) {
+            rentModal.onOpen(listingToUpdate); // Mở RentModal với dữ liệu của listing
+        }
+    }, [listings, rentModal]);
 
     return ( 
         <Container>
@@ -63,9 +73,11 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
                         key={listing.id}
                         data={listing}
                         actionId={listing.id}
-                        onAction={onCancel}
-                        disabled={deletingId === listing.id}
-                        actionLabel="Delete property"
+                        onDelete={onDelete}
+                        onUpdate={onUpdate}
+                        disabled={updatingId === listing.id || deletingId === listing.id}
+                        actionLabel="Update"
+                        secondActionLabel="Delete"
                         currentUser={currentUser}
                     />
                 ))}

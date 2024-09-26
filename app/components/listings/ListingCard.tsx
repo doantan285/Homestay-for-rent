@@ -1,21 +1,25 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useCallback, useMemo, useState } from "react";
 
 import { Safelisting, SafeReservation, SafeUser } from "@/app/types";
 import useCountries from "@/app/hooks/useCountries";
-import { useCallback, useMemo } from "react";
+import useRentModal from "@/app/hooks/useRentModal";
 import { format } from "date-fns";
-import Image from "next/image";
 import HeartButton from "../HeartButton";
 import Button from "../Button";
+import RentModal from "../modals/RentModal";
 
 interface ListingCardProps {
     data: Safelisting;
     reservation?: SafeReservation;
-    onAction?: (id: string) => void;
+    onDelete?: (id: string) => void;
+    onUpdate?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
+    secondActionLabel?: string;
     actionId?: string;
     currentUser?: SafeUser | null;
 }
@@ -23,18 +27,20 @@ interface ListingCardProps {
 const ListingCard: React.FC<ListingCardProps> = ({
     data,
     reservation,
-    onAction,
+    onDelete,
+    onUpdate,
     disabled,
     actionLabel,
-    actionId ="",
-    currentUser
+    secondActionLabel,
+    actionId = "",
+    currentUser,
 }) => {
     const router = useRouter();
     const { getByValue } = useCountries();
-
     const location = getByValue(data.locationValue);
+    const rentModal = useRentModal();
 
-    const handleCancel = useCallback(
+    const handleDelete = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
 
@@ -42,8 +48,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 return;
             }
 
-            onAction?.(actionId);
-        }, [onAction, actionId, disabled]);
+            onDelete?.(actionId);
+        }, [onDelete, actionId, disabled]);
+
+    const handleShowRentModal = (
+        e: React.MouseEvent<HTMLButtonElement>
+    ) => {
+        e.stopPropagation();
+
+        rentModal.setMode('update'); // Thiết lập chế độ cập nhật
+        rentModal.setListing(data); // Truyền thông tin của listing vào modal
+        rentModal.onOpen();
+    };
 
     const price = useMemo(() => {
         if (reservation) {
@@ -114,17 +130,28 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         <div className="font-light">night</div>
                     )}
                 </div>
-                {onAction && actionLabel && (
-                    <Button
-                        disabled={disabled}
-                        small
-                        label={actionLabel}
-                        onClick={handleCancel}
-                    />
-                )}
+                <div className="flex flex-row gap-2">
+                    {onUpdate && (
+                        <Button
+                            disabled={disabled}
+                            small
+                            label={actionLabel || 'Update'}
+                            onClick={handleShowRentModal}
+                        />
+                    )}
+                    {onDelete && secondActionLabel && (
+                        <Button
+                            outline
+                            disabled={disabled}
+                            small
+                            label={secondActionLabel}
+                            onClick={handleDelete}
+                        />
+                    )}
+                </div>
             </div>
         </div>
-     );
+    );
 }
- 
+
 export default ListingCard;
