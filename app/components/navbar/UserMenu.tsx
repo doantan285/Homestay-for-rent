@@ -36,6 +36,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
             return loginModal.onOpen();
         }
 
+        rentModal.setMode("create");
         rentModal.onOpen();
     }, [currentUser, loginModal, rentModal]);
 
@@ -102,6 +103,10 @@ const UserMenu: React.FC<UserMenuProps> = ({
                     <div className="flex flex-col cursor-pointer">
                         {currentUser ? (
                             <>
+                                <MenuItem
+                                    onClick={() => router.push("/account")}
+                                    label="My account"
+                                />
                                 <MenuItem
                                     onClick={() => router.push("/trips")}
                                     label="My trips"

@@ -22,7 +22,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         onChange(result.info.secure_url);
     }, [onChange]);
 
-    return ( 
+    return (
         <CldUploadWidget
             onSuccess={handleUpload}
             uploadPreset="dhvggtyg"
@@ -30,7 +30,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 maxFiles: 1
             }}
         >
-            {({ open }) =>{
+            {({ open }) => {
                 return (
                     <div
                         onClick={() => open?.()}
@@ -71,7 +71,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 )
             }}
         </CldUploadWidget>
-     );
+    );
 }
- 
+
 export default ImageUpload;

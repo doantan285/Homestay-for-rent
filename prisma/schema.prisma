@@ -11,34 +11,40 @@ datasource db {
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String?
-  email String? @unique
-  emailVerified DateTime?
-  image String?
-  hashedPassword String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  favoriteIds String[] @db.ObjectId
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String?
+  email               String?   @unique
+  emailVerified       DateTime?
+  image               String?
+  hashedPassword      String?
+  phoneNumber         String?
+  lastPasswordUpdated DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  favoriteIds         String[]  @db.ObjectId
 
-  accounts Account[]
-  listings Listing[]
-  reservations Reservation[]
+  accounts         Account[]
+  listings         Listing[]
+  reservations     Reservation[]
+  reviews          Review[] // Liên kết với bảng Review
+  sentMessages     Message[]      @relation("sentMessages") // Liên kết tin nhắn gửi
+  receivedMessages Message[]      @relation("receivedMessages") // Liên kết tin nhắn nhận
+  notifications    Notification[] // Liên kết với bảng Notification
 }
 
 model Account {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  type String // Loại tài khoản
-  provider String // Nhà cung cấp dịch vụ (google, facebook)
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String // Loại tài khoản
+  provider          String // Nhà cung cấp dịch vụ (google, facebook)
   providerAccountId String // Id của nhà cung cấp dịch vụ
-  refresh_token String? @db.String
-  access_token String? @db.String
-  expires_at Int?
-  token_type String?
-  scope String?
-  id_token String? @db.String
-  session_state String?
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -46,32 +52,92 @@ model Account {
 }
 
 model Listing {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
-  description String
-  imageSrc String
-  createdAt DateTime @default(now())
-  category String
-  roomCount Int
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  imageSrc      String
+  createdAt     DateTime @default(now())
+  category      String
+  roomCount     Int
   bathroomCount Int
-  guestCount Int
+  guestCount    Int
   locationValue String
-  userId String @db.ObjectId
-  price Int
+  userId        String   @db.ObjectId
+  price         Int
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations Reservation[]
+  reviews      Review[] // Liên kết với bảng Review
 }
 
 model Reservation {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  listingId String @db.ObjectId
-  startDate DateTime
-  endDate DateTime
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  listingId  String   @db.ObjectId
+  startDate  DateTime
+  endDate    DateTime
   totalPrice Int
+  createdAt  DateTime @default(now())
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing     Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  transaction Transaction[] // Liên kết với bảng Transaction
+}
+
+model Admin {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  email          String @unique
+  hashedPassword String // Mật khẩu đã mã hóa
+  role           String @default("admin") // Phân quyền: admin, superadmin
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  listingId String   @db.ObjectId
+  rating    Int // Thang điểm đánh giá từ 1 đến 5
+  comment   String // Nội dung bình luận
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  message    String // Nội dung tin nhắn
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  content   String // Nội dung thông báo
+  read      Boolean  @default(false) // Trạng thái đã đọc
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  reservationId String   @db.ObjectId
+  amount        Int // Số tiền giao dịch
+  paymentMethod String // Phương thức thanh toán: PayPal, Credit Card, etc.
+  status        String // Trạng thái giao dịch: thành công, đang xử lý, thất bại
+  createdAt     DateTime @default(now())
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+}
+
+model Statistics {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  metric String // Loại thống kê: số người dùng, số giao dịch, doanh thu, v.v.
+  value  Int // Giá trị thống kê
+  date   DateTime // Ngày thống kê
 }

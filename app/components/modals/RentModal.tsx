@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import useRentModal from "@/app/hooks/useRentModal";
@@ -33,15 +33,14 @@ const RentModal = () => {
 
     const [step, setStep] = useState(STEPS.CATEGORY);
     const [isLoading, setIsLoading] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const {
         register,
         handleSubmit,
         setValue,
         watch,
-        formState: {
-            errors,
-        },
+        formState: { errors },
         reset
     } = useForm<FieldValues>({
         defaultValues: {
@@ -56,6 +55,33 @@ const RentModal = () => {
             description: ''
         }
     });
+
+    useEffect(() => {
+        if (rentModal.isOpen) {
+            setStep(STEPS.CATEGORY);
+        }
+    }, [rentModal.isOpen]);
+
+    useEffect(() => {
+        if (rentModal.listing) {
+            setIsUpdating(true);
+            reset({
+                // Thiết lập các giá trị cho các trường từ listing
+                category: rentModal.listing.category,
+                location: rentModal.listing.locationValue,
+                guestCount: rentModal.listing.guestCount,
+                roomCount: rentModal.listing.roomCount,
+                bathroomCount: rentModal.listing.bathroomCount,
+                imageSrc: rentModal.listing.imageSrc,
+                price: rentModal.listing.price,
+                title: rentModal.listing.title,
+                description: rentModal.listing.description,
+            });
+        } else {
+            setIsUpdating(false);
+        }
+    }, [rentModal.listing, reset]);
+
 
     const category = watch('category');
     const location = watch('location');
@@ -91,22 +117,43 @@ const RentModal = () => {
 
         setIsLoading(true);
 
-        axios.post('/api/listing', data)
-        .then(() => {
-            toast.success('Listing Created!');
-            router.refresh();
-            reset();
-            setStep(STEPS.CATEGORY);
-            rentModal.onClose();
-        })
-        .catch(() => {
-            toast.error('Something went wrong!');
-        }).finally(() => {
-            setIsLoading(false);
-        })
+        if (rentModal.mode === 'create') {
+            axios.post('/api/listings', data)
+                .then(() => {
+                    toast.success('Listing Created!');
+                    router.refresh();
+                    reset();
+                    setStep(STEPS.CATEGORY);
+                    rentModal.onClose();
+                })
+                .catch(() => {
+                    toast.error('Something went wrong!');
+                }).finally(() => {
+                    setIsLoading(false);
+                })
+        } else if (rentModal.mode === 'update') {
+            axios.put(`/api/listings/${rentModal.listing.id}`, data)
+                .then(() => {
+                    toast.success('Listing Updated!');
+                    router.refresh();
+                    reset();
+                    setStep(STEPS.CATEGORY);
+                    rentModal.onClose();
+                })
+                .catch(() => {
+                    toast.error('Something went wrong!');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        }
     }
 
     const actionLabel = useMemo(() => {
+        if (rentModal.mode === 'update') {
+            return 'Update';
+        }
+
         if (step === STEPS.PRICE) {
             return 'Create';
         }

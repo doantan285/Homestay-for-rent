@@ -19,9 +19,10 @@ export type SafeReservation = Omit<
 
 export type SafeUser = Omit< // Omit để loại bỏ thuộc tính không mong muốn: createdAt, updatedAt, và emailVerified từ type User.
     User,
-    "createdAt" | "updatedAt" | "emailVerified"
+    "createdAt" | "updatedAt" | "emailVerified" | "lastPasswordUpdated"
 > & {
     createdAt: string;
     updatedAt: string;
     emailVerified: string | null;
+    lastPasswordUpdated: string | null;
 };
