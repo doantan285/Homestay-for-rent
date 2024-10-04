@@ -2,19 +2,12 @@ import { Nunito } from "next/font/google";
 import type { Metadata } from 'next';
 import './globals.css';
 
-import Navbar from "./components/navbar/Navbar";
-import ClientOnly from "./components/ClientOnly";
-import RegisterModal from "./components/modals/RegisterModal";
-import LoginModal from "./components/modals/LoginModal";
-import RentModal from "./components/modals/RentModal";
-import SearchModal from "./components/modals/SearchModal";
-
-import ToasterProvider from "./providers/ToasterProvider";
+import RootLayoutClient from "./RootLayoutClient";
 import getCurrentUser from "./actions/getCurrentUser";
 
 export const metadata: Metadata = {
   title: 'Homestay',
-  description: 'Homestay for rent',
+  description: 'Rental And Leasing Homestay',
 }
 
 const font = Nunito({
@@ -31,17 +24,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <ClientOnly>
-          <ToasterProvider />
-          <SearchModal />
-          <RentModal />
-          <LoginModal />
-          <RegisterModal />
-          <Navbar currentUser={currentUser} />
-        </ClientOnly>
-        <div className="pb-20 pt-28">
+        <RootLayoutClient currentUser={currentUser}>
           {children}
-        </div>
+        </RootLayoutClient>
       </body>
     </html>
   )

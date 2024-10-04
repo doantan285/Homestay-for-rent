@@ -29,7 +29,8 @@ export default async function getCurrentUser() {
             ...currentUser,
             createdAt: currentUser.createdAt.toISOString(), // Chuyển đổi đối tượng Date sang chuỗi thời gian quốc tế (ISO 8601)
             updatedAt: currentUser.updatedAt.toISOString(),
-            emailVerified: currentUser.emailVerified?.toISOString() || null
+            emailVerified: currentUser.emailVerified?.toISOString() || null,
+            lastPasswordUpdated: currentUser.lastPasswordUpdated?.toISOString() || null
         };
     } catch (error: any) {
         return null;

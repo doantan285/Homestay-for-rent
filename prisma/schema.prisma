@@ -84,11 +84,19 @@ model Reservation {
   transaction Transaction[] // Liên kết với bảng Transaction
 }
 
+enum Role {
+  ADMIN
+  SUPERADMIN
+}
+
 model Admin {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
-  email          String @unique
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  email          String  @unique
   hashedPassword String // Mật khẩu đã mã hóa
-  role           String @default("admin") // Phân quyền: admin, superadmin
+  role           Role  @default(ADMIN) // Phân quyền: admin, superadmin
+  image          String?
+  createdAt      DateTime @default(now())
+  lastLogin      DateTime?
 }
 
 model Review {
