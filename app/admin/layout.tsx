@@ -1,11 +1,16 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Admin } from "@prisma/client";
 import AdminNavbar from '../components/navbar/AdminNavbar';
 import AdminHeader from '../components/AdminHeader';
+import AdminLogin from './login/page';
+import AdminContent from '../components/AdminContent';
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+  const pathname = usePathname() ?? '';
+  const isLoginPage = pathname === '/admin/login';
+
   const [selectedSection, setSelectedSection] = useState('Dashboard');
 
   const handleSectionChange = (section: string) => {
@@ -13,25 +18,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* AdminHeader at the top */}
-      <AdminHeader />
-
-      <div className="flex flex-1 pt-16">
-        {/* AdminNavbar on the left */}
-        <AdminNavbar onSectionChange={handleSectionChange} />
-
-        {/* Main content on the right */}
-        <div className="flex-1 p-6 bg-gray-100">
-          {selectedSection === 'Dashboard' && <div>Dashboard Content</div>}
-          {selectedSection === 'Users' && <div>Users Content</div>}
-          {selectedSection === 'Listings' && <div>Listings Content</div>}
-          {selectedSection === 'Transactions' && <div>Transactions Content</div>}
-          {selectedSection === 'Reviews' && <div>Reviews Content</div>}
-          {selectedSection === 'Statistics' && <div>Statistics Content</div>}
+    <>
+      {isLoginPage ? (
+        <AdminLogin />
+      ) : (
+        <div className="min-h-screen flex flex-col">
+          <AdminHeader />
+          <div className="flex flex-1 pt-16">
+            <AdminNavbar onSectionChange={handleSectionChange} />
+            <AdminContent selectedSection={selectedSection} />
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

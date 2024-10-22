@@ -6,6 +6,9 @@ const nextConfig = {
             "lh3.googleusercontent.com",
             "res.cloudinary.com",
         ]
+    },
+    env: {
+        JWT_SECRET: process.env.JWT_SECRET, // Thêm biến môi trường JWT_SECRET
     }
 }
 

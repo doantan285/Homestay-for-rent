@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 import Button from '@/app/components/Button';
 
 interface AdminNavbarProps {
@@ -7,57 +9,36 @@ interface AdminNavbarProps {
 
 const AdminNavbar = ({ onSectionChange }: AdminNavbarProps) => {
   const [selectedSection, setSelectedSection] = useState('Dashboard');
+  const router = useRouter();
 
-  const handleButtonClick = (section: string) => {
+  const sections = [
+    { label: 'Dashboard', value: 'Dashboard', url: '/admin/dashboard' },
+    { label: 'Users', value: 'Users', url: '/admin/users' },
+    { label: 'Listings', value: 'Listings', url: '/admin/listings' },
+    { label: 'Transactions', value: 'Transactions', url: '/admin/transactions' },
+    { label: 'Reviews', value: 'Reviews', url: '/admin/reviews' },
+    { label: 'Statistics', value: 'Statistics', url: '/admin/statistics' },
+    { label: 'My Account', value: 'MyAccount', url: '/admin/myaccount' },
+  ];
+
+  const handleButtonClick = (section: string, url: string) => {
     setSelectedSection(section);
     onSectionChange(section);
+    router.push(url);
   };
 
   return (
     <div className="w-64 h-full p-6">
       <ul className="space-y-6">
-        <li>
-          <Button
-            label="Dashboard"
-            onClick={() => handleButtonClick('Dashboard')}
-            outline={selectedSection !== 'Dashboard'}
-          />
-        </li>
-        <li>
-          <Button
-            label="Users"
-            onClick={() => handleButtonClick('Users')}
-            outline={selectedSection !== 'Users'}
-          />
-        </li>
-        <li>
-          <Button
-            label="Listings"
-            onClick={() => handleButtonClick('Listings')}
-            outline={selectedSection !== 'Listings'}
-          />
-        </li>
-        <li>
-          <Button
-            label="Transactions"
-            onClick={() => handleButtonClick('Transactions')}
-            outline={selectedSection !== 'Transactions'}
-          />
-        </li>
-        <li>
-          <Button
-            label="Reviews"
-            onClick={() => handleButtonClick('Reviews')}
-            outline={selectedSection !== 'Reviews'}
-          />
-        </li>
-        <li>
-          <Button
-            label="Statistics"
-            onClick={() => handleButtonClick('Statistics')}
-            outline={selectedSection !== 'Statistics'}
-          />
-        </li>
+        {sections.map(({ label, value, url }) => (
+          <li key={value}>
+            <Button
+              label={label}
+              onClick={() => handleButtonClick(value, url)}
+              outline={selectedSection !== value}
+            />
+          </li>
+        ))}
       </ul>
     </div>
   );

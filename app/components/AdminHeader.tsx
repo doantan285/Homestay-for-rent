@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import { signOut } from "next-auth/react";
 import Container from "./Container";
 import Logo from "./navbar/Logo";
 import Avatar from "./Avatar";
 import { Admin } from "@prisma/client";
 import MenuItem from "./navbar/MenuItem";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface AdminHeaderProps {
     currentAdmin?: Admin;
@@ -24,6 +25,16 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     const toggleOpen = useCallback(() => {
         setIsOpen((value) => !value);
     }, []);
+
+    const handleLogout = async () => {
+        try {
+            await axios.post('/api/admin/logout');
+            toast.success('Logged out successfully');
+            router.push('/admin/login');
+        } catch (error) {
+            toast.error('Logout failed');
+        }
+    };
 
     return (
         <div className="realtive fixed w-full bg-white z-10 shadow-sm">
@@ -87,19 +98,17 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     "
                 >
                     <div className="flex flex-col cursor-pointer">
-
                         <>
                             <MenuItem
-                                onClick={() => router.push("/account")}
+                                onClick={() => router.push("/admin/account")}
                                 label="My account"
                             />
                             <hr />
                             <MenuItem
-                                onClick={() => signOut()}
+                                onClick={handleLogout}
                                 label="Logout"
                             />
                         </>
-
                     </div>
                 </div>
             )}

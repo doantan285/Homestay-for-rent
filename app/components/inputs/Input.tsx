@@ -15,7 +15,9 @@ interface InputProps {
     formatPrice?: boolean;
     required?: boolean;
     register: UseFormRegister<FieldValues>,
-    errors: FieldErrors
+    errors: FieldErrors,
+    value?: string;
+    autoFocus?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -26,7 +28,9 @@ const Input: React.FC<InputProps> = ({
     formatPrice,
     required,
     register,
-    errors
+    errors,
+    value,
+    autoFocus
 }) => {
     return (
         <div className='w-full relative'>
@@ -44,6 +48,8 @@ const Input: React.FC<InputProps> = ({
             <input
                 id={id}
                 disabled={disabled}
+                value={value}
+                autoFocus={autoFocus}
                 {...register(id, { required })}
                 placeholder=' '
                 type={type}

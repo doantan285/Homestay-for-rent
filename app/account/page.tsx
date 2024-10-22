@@ -4,7 +4,7 @@ import AccountClient from "./AccountClient";
 
 import getCurrentUser from "../actions/getCurrentUser";
 
-const account = async () => {
+const Account = async () => {
     const currentUser = await getCurrentUser();
 
     if (!currentUser) {
@@ -27,4 +27,4 @@ const account = async () => {
      );
 }
  
-export default account;
+export default Account;

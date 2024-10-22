@@ -15,6 +15,7 @@ interface ModalProps {
     disabled?: boolean;
     secondaryAction?: () => void;
     secondaryActionLabel?: string;
+    isAdminLogin?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -27,7 +28,8 @@ const Modal: React.FC<ModalProps> = ({
     actionLabel,
     disabled,
     secondaryAction,
-    secondaryActionLabel
+    secondaryActionLabel,
+    isAdminLogin
 }) => {
     const [showModal, setShowModal] = useState(isOpen);
 
@@ -147,8 +149,9 @@ const Modal: React.FC<ModalProps> = ({
                                         absolute
                                         left-9
                                     "
+                                    disabled={isAdminLogin}
                                 >
-                                    <IoMdClose size={18} />
+                                    {!isAdminLogin && <IoMdClose size={18} />}
                                 </button>
                                 <div className="text-lg font-semibold">
                                     {title}

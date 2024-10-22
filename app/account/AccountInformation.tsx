@@ -27,12 +27,6 @@ const AccountInformation: React.FC<AccountInformationProps> = ({
     const [passwordLastUpdated, setPasswordLastUpdated] = useState(lastPasswordUpdated);
 
     const handleSave = async () => {
-        // if (newContent === content) {
-        //     toast.error("No changes made.");
-        //     setIsEditing(false);
-        //     return;
-        // }
-
         setLoading(true);
 
         try {
