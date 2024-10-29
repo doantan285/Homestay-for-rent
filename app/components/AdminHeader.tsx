@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import Container from "./Container";
 import Logo from "./navbar/Logo";
@@ -12,14 +12,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 interface AdminHeaderProps {
-    currentAdmin?: Admin;
+    currentAdmin: Admin | null;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({
-    currentAdmin
-}) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({ currentAdmin }) => {
     const router = useRouter();
-
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleOpen = useCallback(() => {
@@ -38,12 +35,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
     return (
         <div className="realtive fixed w-full bg-white z-10 shadow-sm">
-            <div
-                className="
-                py-4
-                border-b-[1px]
-            "
-            >
+            <div className="py-4 border-b-[1px]">
                 <Container>
                     <div
                         className="
@@ -59,20 +51,20 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         <div
                             onClick={toggleOpen}
                             className="
-                        p-4
-                        md:py-1
-                        md:px-2
-                        border-[1px]
-                        border-neutral-200
-                        flex
-                        flex-row
-                        items-center
-                        gap-3
-                        rounded-full
-                        cursor-pointer
-                        hover:shadow-md
-                        transition
-                    "
+                                p-4
+                                md:py-1
+                                md:px-2
+                                border-[1px]
+                                border-neutral-200
+                                flex
+                                flex-row
+                                items-center
+                                gap-3
+                                rounded-full
+                                cursor-pointer
+                                hover:shadow-md
+                                transition
+                            "
                         >
                             <AiOutlineMenu />
                             <div className="hidden md:block">
@@ -88,8 +80,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         absolute
                         rounded-xl
                         shadow-md
-                        w-[40vw]
-                        md:w-1/12
+                        w-48
                         bg-white
                         overflow-hidden
                         right-20
@@ -97,17 +88,24 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         text-sm
                     "
                 >
-                    <div className="flex flex-col cursor-pointer">
+                    <div className="flex flex-col">
                         <>
-                            <MenuItem
-                                onClick={() => router.push("/admin/account")}
-                                label="My account"
-                            />
+                            {currentAdmin ? (
+                                <div className="px-4 py-3 font-semibold flex flex-col gap-2 text-rose-500">
+                                    <div>{currentAdmin?.email}</div>
+                                    <div>{currentAdmin?.role}</div>
+                                </div>
+                            ) : (
+                                <div className="px-4 py-3 font-semibold flex flex-col gap-2 text-slate-500">Loading...</div>
+                            )}
                             <hr />
-                            <MenuItem
-                                onClick={handleLogout}
-                                label="Logout"
-                            />
+                            <div className="cursor-pointer">
+                                <MenuItem
+                                    onClick={handleLogout}
+                                    label="Logout"
+                                />
+                            </div>
+
                         </>
                     </div>
                 </div>

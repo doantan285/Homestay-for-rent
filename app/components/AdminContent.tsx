@@ -1,3 +1,4 @@
+import { usePathname } from "next/navigation";
 import Dashboard from "../admin/dashboard/page";
 import Listings from "../admin/listings/page";
 import MyAccount from "../admin/myaccount/page";
@@ -6,22 +7,32 @@ import Statistics from "../admin/statistics/page";
 import Transactions from "../admin/transactions/page";
 import Users from "../admin/users/page";
 
-interface AdminContentProps {
-    selectedSection: string;
-}
+const AdminContent = () => {
+    const pathname = usePathname();
 
-const AdminContent: React.FC<AdminContentProps> = ({
-    selectedSection
-}) => {
+    const renderContent = () => {
+        switch (pathname) {
+            case '/admin/dashboard':
+                return <Dashboard />;
+            case '/admin/users':
+                return <Users />;
+            case '/admin/listings':
+                return <Listings />;
+            case '/admin/transactions':
+                return <Transactions />;
+            case '/admin/reviews':
+                return <Reviews />;
+            case '/admin/statistics':
+                return <Statistics />;
+            case '/admin/myaccount':
+                return <MyAccount />;
+            default:
+                return <Dashboard />;
+        }
+    };
     return (
         <div className="flex-1 p-6 bg-gray-100">
-            {selectedSection === 'Dashboard' && <div><Dashboard /></div>}
-            {selectedSection === 'Users' && <div><Users /></div>}
-            {selectedSection === 'Listings' && <div><Listings /></div>}
-            {selectedSection === 'Transactions' && <div><Transactions /></div>}
-            {selectedSection === 'Reviews' && <div><Reviews /></div>}
-            {selectedSection === 'Statistics' && <div><Statistics /></div>}
-            {selectedSection === 'MyAccount' && <div><MyAccount /></div>}
+            {renderContent()}
         </div>
     );
 }

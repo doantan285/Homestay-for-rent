@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 import Button from '@/app/components/Button';
 
@@ -8,10 +8,11 @@ interface AdminNavbarProps {
 }
 
 const AdminNavbar = ({ onSectionChange }: AdminNavbarProps) => {
-  const [selectedSection, setSelectedSection] = useState('Dashboard');
   const router = useRouter();
+  const pathname = usePathname();
+  const [selectedSection, setSelectedSection] = useState('');
 
-  const sections = [
+  const sections = useMemo(() => [
     { label: 'Dashboard', value: 'Dashboard', url: '/admin/dashboard' },
     { label: 'Users', value: 'Users', url: '/admin/users' },
     { label: 'Listings', value: 'Listings', url: '/admin/listings' },
@@ -19,7 +20,15 @@ const AdminNavbar = ({ onSectionChange }: AdminNavbarProps) => {
     { label: 'Reviews', value: 'Reviews', url: '/admin/reviews' },
     { label: 'Statistics', value: 'Statistics', url: '/admin/statistics' },
     { label: 'My Account', value: 'MyAccount', url: '/admin/myaccount' },
-  ];
+  ], []);
+
+  useEffect(() => {
+    const currentSection = sections.find(section => section.url === pathname);
+    if (currentSection) {
+      setSelectedSection(currentSection.value);
+      onSectionChange(currentSection.value);
+    }
+  }, [pathname, sections, onSectionChange]);
 
   const handleButtonClick = (section: string, url: string) => {
     setSelectedSection(section);

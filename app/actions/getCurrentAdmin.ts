@@ -1,35 +1,36 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { NextApiRequest } from "next";
 import prisma from "@/app/libs/prismadb";
+import { verify } from "jsonwebtoken";
 
-export async function getSession() {
-    return await getServerSession(authOptions);
-}
+export default async function getCurrentAdmin(req: NextApiRequest) {
+    const token = req.cookies.token;
+    console.log('Token:', token);
+    if (!token) {
+        return null;
+    }
 
-export default async function getCurrentAdmin() {
     try {
-        const session = await getSession();
+        const decoded = verify(token, process.env.JWT_SECRET as string);
 
-        if (!session?.user?.email) {
+        if (typeof decoded === "string") {
             return null;
         }
+
+        const adminId = decoded.id;
 
         const currentAdmin = await prisma.admin.findUnique({
             where: {
-                email: session.user.email as string
-            }
+                id: adminId,
+            },
         });
-
-        if (!currentAdmin) {
-            return null;
-        }
 
         return {
             ...currentAdmin,
-            createdAt: currentAdmin.createdAt.toISOString(),
-            lastLogin: currentAdmin.lastLogin?.toISOString() || null
-        }
-    } catch (error: any) {
+            createdAt: currentAdmin?.createdAt.toISOString(),
+            lastLogin: currentAdmin?.lastLogin?.toISOString() || null,
+        };
+    } catch (error) {
+        console.error('Error retrieving current admin:', error);
         return null;
     }
 }

@@ -12,13 +12,19 @@ const Avatar: React.FC<AvatarProps> = ({
     size = 30
 }) => {
     return ( 
-        <Image
-            className="rounded-full"
-            height={size}
-            width={size}
-            alt="Avatar"
-            src={src || "/images/placeholder.jpg"}
-        />
+        <div
+            style={{ width: size, height: size }}
+            className="rounded-full overflow-hidden"
+        >
+            <Image
+                className="rounded-full"
+                height={size}
+                width={size}
+                alt="Avatar"
+                src={src || "/images/placeholder.jpg"}
+                objectFit="cover"
+            />
+        </div>
      );
 }
  
