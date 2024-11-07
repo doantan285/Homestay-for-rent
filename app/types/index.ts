@@ -29,8 +29,10 @@ export type SafeUser = Omit< // Omit để loại bỏ thuộc tính không mong
 
 export type SafeAdmin = Omit<
     Admin,
-    "createdAt" | "lastLogin"
+    "createdAt" | "lastLogin" | "updatedAt" | "lastPasswordUpdated"
 > & {
-    createdAt: string;
-    lastLogin: string | null;
+    createdAt: string; // Chuyển đổi thành string
+    lastLogin: string | null; // Chuyển đổi thành string hoặc null
+    lastPasswordUpdated: string | null; // Chuyển đổi thành string hoặc null
+    updatedAt: string | null; // Thêm updatedAt nếu bạn muốn sử dụng
 }

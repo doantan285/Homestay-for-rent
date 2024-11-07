@@ -1,18 +1,18 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 import Container from "./Container";
 import Logo from "./navbar/Logo";
 import Avatar from "./Avatar";
-import { Admin } from "@prisma/client";
 import MenuItem from "./navbar/MenuItem";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { SafeAdmin } from "../types";
 
 interface AdminHeaderProps {
-    currentAdmin: Admin | null;
+    currentAdmin: SafeAdmin | null;
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ currentAdmin }) => {
@@ -105,7 +105,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ currentAdmin }) => {
                                     label="Logout"
                                 />
                             </div>
-
                         </>
                     </div>
                 </div>

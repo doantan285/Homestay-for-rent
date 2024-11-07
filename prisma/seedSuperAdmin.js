@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
 
@@ -13,9 +13,11 @@ async function createSuperAdmin() {
         const superAdmin = await prisma.admin.create({
             data: {
                 email: email,
+                name: 'Đoàn Tần',
                 hashedPassword: hashedPassword,
                 role: 'SUPERADMIN',
                 image: null,
+                phoneNumber: null,
             },
         });
 

@@ -147,7 +147,6 @@ const AdminAccountInformation: React.FC<AdminAccountInformationProps> = ({
                             passwordLastUpdated
                                 ? `Last updated ${passwordLastUpdated.toLocaleDateString()}`
                                 : "Password not updated yet"
-                            
                         ) : (
                             newContent
                         )

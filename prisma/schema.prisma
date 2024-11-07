@@ -10,6 +10,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  SUPERADMIN
+}
+
+model Admin {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String?
+  email               String    @unique
+  hashedPassword      String // Mật khẩu đã mã hóa
+  role                Role      @default(ADMIN) // Phân quyền: admin, superadmin
+  image               String?
+  phoneNumber         String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
+  lastPasswordUpdated DateTime?
+  lastLogin           DateTime? 
+}
+
 model User {
   id                  String    @id @default(auto()) @map("_id") @db.ObjectId
   name                String?
@@ -18,10 +37,11 @@ model User {
   image               String?
   hashedPassword      String?
   phoneNumber         String?
-  lastPasswordUpdated DateTime?
+  lastPasswordUpdated DateTime? 
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
   favoriteIds         String[]  @db.ObjectId
+  isLocked            Boolean   @default(false)
 
   accounts         Account[]
   listings         Listing[]
@@ -82,23 +102,6 @@ model Reservation {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing     Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
   transaction Transaction[] // Liên kết với bảng Transaction
-}
-
-enum Role {
-  ADMIN
-  SUPERADMIN
-}
-
-model Admin {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name           String?
-  email          String    @unique
-  hashedPassword String // Mật khẩu đã mã hóa
-  role           Role      @default(ADMIN) // Phân quyền: admin, superadmin
-  image          String?
-  phoneNumber    String?
-  createdAt      DateTime  @default(now())
-  lastLogin      DateTime?
 }
 
 model Review {

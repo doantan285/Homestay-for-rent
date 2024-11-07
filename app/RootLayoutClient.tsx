@@ -8,10 +8,12 @@ import LoginModal from "./components/modals/LoginModal";
 import SearchModal from "./components/modals/SearchModal";
 import RentModal from "./components/modals/SearchModal";
 import ToasterProvider from "./providers/ToasterProvider";
+import AdminLogin from "@/app/admin/login/page";
 
 const RootLayoutClient = ({ children, currentUser }: { children: React.ReactNode, currentUser: any }) => {
     const pathname = usePathname() ?? '';
     const isAdminRoute = pathname.startsWith('/admin');
+    const isLoginPage = pathname === '/admin/login';
 
     return (
         <>
@@ -25,7 +27,11 @@ const RootLayoutClient = ({ children, currentUser }: { children: React.ReactNode
             </ClientOnly>
             {isAdminRoute ? (
                 <div>
-                    {children}
+                    {isLoginPage ? (
+                        <AdminLogin />
+                    ) : (
+                        children
+                    )}
                 </div>
             ) : (
                 <div className="pb-20 pt-28">

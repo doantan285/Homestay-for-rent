@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname } from "next/navigation";
 import Dashboard from "../admin/dashboard/page";
 import Listings from "../admin/listings/page";
@@ -6,8 +8,13 @@ import Reviews from "../admin/reviews/page";
 import Statistics from "../admin/statistics/page";
 import Transactions from "../admin/transactions/page";
 import Users from "../admin/users/page";
+import { SafeAdmin } from "../types";
 
-const AdminContent = () => {
+interface AdminContentProps {
+    currentAdmin: SafeAdmin | null;
+}
+
+const AdminContent: React.FC<AdminContentProps> = ({ currentAdmin }) => {
     const pathname = usePathname();
 
     const renderContent = () => {
@@ -25,7 +32,7 @@ const AdminContent = () => {
             case '/admin/statistics':
                 return <Statistics />;
             case '/admin/myaccount':
-                return <MyAccount />;
+                return <MyAccount currentAdmin={currentAdmin} />;
             default:
                 return <Dashboard />;
         }
