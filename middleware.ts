@@ -18,7 +18,13 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('admin-token')?.value;
 
     if (request.nextUrl.pathname.startsWith('/admin')) {
-        if (!token || !(await verifyToken(token, process.env.JWT_SECRET!))) {
+        if (!token) {
+            return NextResponse.redirect(new URL('/admin/login', request.url));
+        }
+
+        // Verify the token only if it exists
+        const isValid = await verifyToken(token, process.env.JWT_SECRET!);
+        if (!isValid) {
             return NextResponse.redirect(new URL('/admin/login', request.url));
         }
     }
@@ -33,6 +39,7 @@ export const config = {
         "/reservations",
         "/properties",
         "/favorites",
+        "/manage-booking",
         "/admin/:path((?!login).*)",
     ],
 };

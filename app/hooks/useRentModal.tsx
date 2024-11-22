@@ -1,10 +1,11 @@
 import { create } from 'zustand';
+import { Safelisting } from '../types';
 
 interface RentModalStore {
     isOpen: boolean;
-    onOpen: () => void;
+    onOpen: (listing?: Safelisting) => void;
     onClose: () => void;
-    listing?: any; // Đối tượng listing
+    listing?: Safelisting; // Đối tượng listing
     setListing: (listing: any) => void; // Hàm để thiết lập listing
     mode: 'create' | 'update'; // Chế độ tạo mới hoặc cập nhật
     setMode: (mode: 'create' | 'update') => void; // Hàm để thiết lập chế độ

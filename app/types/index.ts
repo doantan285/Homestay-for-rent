@@ -1,4 +1,4 @@
-import { Admin, Listing, Reservation, User } from "@prisma/client"; // Type User tự động tạo ra bởi Prisma dựa trên User trong schema. Type đại diện cho cấu trúc 1 bản ghi 
+import { Admin, Listing, Reservation, Review, User } from "@prisma/client"; // Type User tự động tạo ra bởi Prisma dựa trên User trong schema. Type đại diện cho cấu trúc 1 bản ghi 
 
 export type Safelisting = Omit<
     Listing,
@@ -27,6 +27,8 @@ export type SafeUser = Omit< // Omit để loại bỏ thuộc tính không mong
     lastPasswordUpdated: string | null;
 };
 
+export type SafeUserForReview = Pick<User, "id" | "name" | "image">;
+
 export type SafeAdmin = Omit<
     Admin,
     "createdAt" | "lastLogin" | "updatedAt" | "lastPasswordUpdated"
@@ -36,3 +38,11 @@ export type SafeAdmin = Omit<
     lastPasswordUpdated: string | null; // Chuyển đổi thành string hoặc null
     updatedAt: string | null; // Thêm updatedAt nếu bạn muốn sử dụng
 }
+
+export type SafeReview = Omit<
+    Review,
+    "createdAt" | "user"
+> & {
+    createdAt: string;
+    user: SafeUserForReview;
+};

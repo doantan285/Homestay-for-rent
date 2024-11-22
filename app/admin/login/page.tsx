@@ -34,6 +34,7 @@ const AdminLoginModal = () => {
             if (response.status === 200) {
                 toast.success('Logged in');
                 router.push('/admin/dashboard');
+                router.refresh();
             } else {
                 toast.error('Failed to login');
             }

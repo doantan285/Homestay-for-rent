@@ -7,7 +7,7 @@ import { eachDayOfInterval, differenceInCalendarDays } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Safelisting, SafeReservation, SafeUser } from "@/app/types";
+import { Safelisting, SafeReservation, SafeReview, SafeUser } from "@/app/types";
 import { categories } from "@/app/components/navbar/Categories";
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
@@ -15,6 +15,7 @@ import ListingInfo from "@/app/components/listings/ListingInfo";
 
 import useLoginModal from "@/app/hooks/useLoginModal";
 import ListingReservation from "@/app/components/listings/ListingReservation";
+import ListingRate from "@/app/components/listings/ListingRate";
 
 const initialDateRange = {
     startDate: new Date(),
@@ -28,12 +29,14 @@ interface ListingClientProps {
         user: SafeUser
     };
     currentUser: SafeUser | null;
+    reviews: SafeReview[];
 }
 
 const ListingClient: React.FC<ListingClientProps> = ({
     listing,
     reservations = [],
-    currentUser
+    currentUser,
+    reviews = []
 }) => {
     const loginModal = useLoginModal();
     const router = useRouter();
@@ -73,7 +76,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
         .then(() => {
             toast.success('Listing reserved!');
             setDateRange(initialDateRange);
-            router.push('/trips');
+            router.push('/reservations');
         })
         .catch(() => {
             toast.error('Something went wrong!');
@@ -156,6 +159,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
                             />
                         </div>
                     </div>
+                    <ListingRate
+                        reviews={reviews}
+                    />
                 </div>
             </div>
         </Container>

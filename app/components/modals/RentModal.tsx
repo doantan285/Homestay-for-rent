@@ -66,7 +66,6 @@ const RentModal = () => {
         if (rentModal.listing) {
             setIsUpdating(true);
             reset({
-                // Thiết lập các giá trị cho các trường từ listing
                 category: rentModal.listing.category,
                 location: rentModal.listing.locationValue,
                 guestCount: rentModal.listing.guestCount,
@@ -92,7 +91,7 @@ const RentModal = () => {
 
     const Map = useMemo(() => dynamic(() => import('../Map'), {
         ssr: false
-    }), [location]);
+    }), []);
 
     const setCustomValue = (id: string, value: any) => {
         setValue(id, value, {
@@ -132,6 +131,11 @@ const RentModal = () => {
                     setIsLoading(false);
                 })
         } else if (rentModal.mode === 'update') {
+            if (!rentModal.listing) {
+                toast.error('Listing is missing!');
+                return;
+            }
+            
             axios.put(`/api/listings/${rentModal.listing.id}`, data)
                 .then(() => {
                     toast.success('Listing Updated!');
@@ -159,7 +163,7 @@ const RentModal = () => {
         }
 
         return 'Next';
-    }, [step]);
+    }, [step, rentModal.mode]);
 
     const secondaryActionLabel = useMemo(() => {
         if (step === STEPS.CATEGORY) {

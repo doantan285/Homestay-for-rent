@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function createSuperAdmin() {
     try {
         const email = 'doantan@gmail.com';
-        const password = 'doantan';
+        const password = 'doanbatan';
 
         const hashedPassword = await bcrypt.hash(password, 10);
 

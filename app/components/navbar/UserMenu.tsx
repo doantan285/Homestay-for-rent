@@ -35,7 +35,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
         if (!currentUser) {
             return loginModal.onOpen();
         }
-
+        
         rentModal.setMode("create");
         rentModal.onOpen();
     }, [currentUser, loginModal, rentModal]);
@@ -124,8 +124,8 @@ const UserMenu: React.FC<UserMenuProps> = ({
                                     label="My properties"
                                 />
                                 <MenuItem
-                                    onClick={rentModal.onOpen}
-                                    label="Homestay your home"
+                                    onClick={() => router.push("/manage-booking")}
+                                    label="Manage booking"
                                 />
                                 <hr />
                                 <MenuItem

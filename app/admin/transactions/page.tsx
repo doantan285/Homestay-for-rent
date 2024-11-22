@@ -1,6 +1,8 @@
+import TransactionsClient from "./TransactionsClient";
+
 const Transactions = () => {
     return ( 
-        <div>Transaction Content</div>
+        <TransactionsClient />
      );
 }
  

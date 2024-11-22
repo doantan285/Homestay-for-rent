@@ -1,6 +1,8 @@
+import StatisticClient from "./StatisticClient";
+
 const Statistics = () => {
     return ( 
-        <div>Statistic Content</div>
+        <StatisticClient />
      );
 }
  

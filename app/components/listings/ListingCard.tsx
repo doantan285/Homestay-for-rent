@@ -17,6 +17,8 @@ interface ListingCardProps {
     reservation?: SafeReservation;
     onDelete?: (id: string) => void;
     onUpdate?: (id: string) => void;
+    onRating?: (id: string) => void;
+    onAccept?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
     secondActionLabel?: string;
@@ -29,6 +31,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
     reservation,
     onDelete,
     onUpdate,
+    onRating,
+    onAccept,
     disabled,
     actionLabel,
     secondActionLabel,
@@ -56,9 +60,23 @@ const ListingCard: React.FC<ListingCardProps> = ({
     ) => {
         e.stopPropagation();
 
-        rentModal.setMode('update'); // Thiết lập chế độ cập nhật
-        rentModal.setListing(data); // Truyền thông tin của listing vào modal
+        rentModal.setMode('update');
+        rentModal.setListing(data);
         rentModal.onOpen();
+    };
+
+    const handleRating = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (onRating) {
+            onRating(actionId);
+        }
+    };
+
+    const handleAccept = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (onAccept) {
+            onAccept(actionId);
+        }
     };
 
     const price = useMemo(() => {
@@ -139,6 +157,14 @@ const ListingCard: React.FC<ListingCardProps> = ({
                             onClick={handleShowRentModal}
                         />
                     )}
+                    {onAccept && (
+                        <Button
+                            disabled={disabled}
+                            small
+                            label={actionLabel || 'Accept'}
+                            onClick={handleAccept}
+                        />
+                    )}
                     {onDelete && secondActionLabel && (
                         <Button
                             outline
@@ -148,6 +174,19 @@ const ListingCard: React.FC<ListingCardProps> = ({
                             onClick={handleDelete}
                         />
                     )}
+                    {onRating && (
+                        <Button
+                            disabled={disabled}
+                            small
+                            label={actionLabel || 'Rating'}
+                            onClick={handleRating}
+                        />
+                    )}
+                </div>
+                <div className="text-sm text-neutral-500">
+                    {reservation?.status === "PENDING" && "Pending approval"}
+                    {reservation?.status === "ACCEPTED" && "Reservation accepted"}
+                    {reservation?.status === "DECLINED" && "Reservation declined"}
                 </div>
             </div>
         </div>

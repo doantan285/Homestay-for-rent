@@ -26,7 +26,7 @@ model Admin {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime? @updatedAt
   lastPasswordUpdated DateTime?
-  lastLogin           DateTime? 
+  lastLogin           DateTime?
 }
 
 model User {
@@ -37,7 +37,7 @@ model User {
   image               String?
   hashedPassword      String?
   phoneNumber         String?
-  lastPasswordUpdated DateTime? 
+  lastPasswordUpdated DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
   favoriteIds         String[]  @db.ObjectId
@@ -90,14 +90,21 @@ model Listing {
   reviews      Review[] // Liên kết với bảng Review
 }
 
+enum ReservationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model Reservation {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String   @db.ObjectId
-  listingId  String   @db.ObjectId
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String            @db.ObjectId
+  listingId  String            @db.ObjectId
   startDate  DateTime
   endDate    DateTime
   totalPrice Int
-  createdAt  DateTime @default(now())
+  createdAt  DateTime          @default(now())
+  status     ReservationStatus @default(PENDING)
 
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing     Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -142,7 +149,7 @@ model Transaction {
   reservationId String   @db.ObjectId
   amount        Int // Số tiền giao dịch
   paymentMethod String // Phương thức thanh toán: PayPal, Credit Card, etc.
-  status        String // Trạng thái giao dịch: thành công, đang xử lý, thất bại
+  status        String // Trạng thái giao dịch: pending, paid, refund
   createdAt     DateTime @default(now())
 
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)

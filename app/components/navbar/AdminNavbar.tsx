@@ -16,10 +16,10 @@ const AdminNavbar = ({ onSectionChange }: AdminNavbarProps) => {
 
   const sections = useMemo(() => [
     { label: 'Dashboard', value: 'Dashboard', url: '/admin/dashboard' },
-    { label: 'Users', value: 'Users', url: '/admin/users' },
+    { label: 'Admins', value: 'Admins', url: '/admin/admin-management' },
+    { label: 'Users', value: 'Users', url: '/admin/users-management' },
     { label: 'Listings', value: 'Listings', url: '/admin/listings' },
     { label: 'Transactions', value: 'Transactions', url: '/admin/transactions' },
-    { label: 'Reviews', value: 'Reviews', url: '/admin/reviews' },
     { label: 'Statistics', value: 'Statistics', url: '/admin/statistics' },
     { label: 'My Account', value: 'MyAccount', url: '/admin/myaccount' },
   ], []);

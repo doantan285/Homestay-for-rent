@@ -20,7 +20,7 @@ const ReservationsPage = async () => {
     }
 
     const reservations = await getReservations({
-        authorId: currentUser.id,
+        guestId: currentUser.id,
     });
 
     if (reservations.length === 0) {
@@ -28,7 +28,7 @@ const ReservationsPage = async () => {
             <ClientOnly>
                 <EmptyState
                     title="No reservations found"
-                    subtitle="Looks like you have no reservations on your properties"
+                    subtitle="Track your properties booked from customers"
                 />
             </ClientOnly>
         );

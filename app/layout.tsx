@@ -4,6 +4,7 @@ import './globals.css';
 
 import RootLayoutClient from "./RootLayoutClient";
 import getCurrentUser from "./actions/getCurrentUser";
+import getMessages from "./actions/getMessage";
 
 export const metadata: Metadata = {
   title: 'Homestay',
@@ -20,11 +21,12 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const currentUser = await getCurrentUser();
+  const message = await getMessages();
 
   return (
     <html lang="en">
       <body className={font.className}>
-        <RootLayoutClient currentUser={currentUser}>
+        <RootLayoutClient currentUser={currentUser} message={message}>
           {children}
         </RootLayoutClient>
       </body>

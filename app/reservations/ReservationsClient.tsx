@@ -4,9 +4,7 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { SafeReservation, SafeUser } from "../types";
-
 import Heading from "../components/Heading";
 import Container from "../components/Container";
 import ListingCard from "../components/listings/ListingCard";
@@ -22,6 +20,11 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
 }) => {
     const router = useRouter();
     const [deletingId, setDeletingId] = useState('');
+
+    const today = new Date();
+    const upcomingReservations = reservations.filter(reservation =>
+        new Date(reservation.endDate) >= today
+    );
 
     const onCancel = useCallback((id: string) => {
         setDeletingId(id);
@@ -43,7 +46,7 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
         <Container>
             <Heading
                 title="Reservations"
-                subtitle="Bookings on your properties"
+                subtitle="Properties you have booked for your upcoming trip"
             />
             <div
                 className="
@@ -58,18 +61,17 @@ const ReservationsClient: React.FC<ReservationsClientProps> = ({
                     gap-8
                 "
             >
-                {reservations.map((reservation) => (
+                {upcomingReservations.map((reservation) => (
                     <ListingCard
                         key={reservation.id}
                         data={reservation.listing}
                         reservation={reservation}
                         actionId={reservation.id}
                         onDelete={onCancel}
-                        disabled={deletingId === reservation.id}
-                        actionLabel="Cancel guest reservation"
+                        disabled={reservation.status === "ACCEPTED" || deletingId === reservation.id}
+                        secondActionLabel="Cancel reservation"
                         currentUser={currentUser}
                     />
-
                 ))}
             </div>
         </Container>

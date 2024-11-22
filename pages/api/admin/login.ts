@@ -40,7 +40,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             { expiresIn: '4h' }
         );
 
-        res.setHeader('Set-Cookie', `admin-token=${token}; HttpOnly; Path=/; Max-Age=14400; SameSite=Strict`);
+        // res.setHeader('Set-Cookie', `admin-token=${token}; HttpOnly; Path=/; Max-Age=14400; SameSite=Strict`);
+        res.setHeader('Set-Cookie', [
+            `admin-token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict`,
+            `admin-token=${token}; HttpOnly; Path=/; Max-Age=14400; SameSite=Strict`
+        ]);
 
         return res.status(200).json({ message: 'Logged in successfully', token });
     } catch (error: any) {

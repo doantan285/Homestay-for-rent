@@ -4,10 +4,10 @@ import { usePathname } from "next/navigation";
 import Dashboard from "../admin/dashboard/page";
 import Listings from "../admin/listings/page";
 import MyAccount from "../admin/myaccount/page";
-import Reviews from "../admin/reviews/page";
 import Statistics from "../admin/statistics/page";
 import Transactions from "../admin/transactions/page";
-import Users from "../admin/users/page";
+import UsersManagement from "../admin/users-management/page";
+import AdminManagement from "../admin/admin-management/page";
 import { SafeAdmin } from "../types";
 
 interface AdminContentProps {
@@ -21,14 +21,14 @@ const AdminContent: React.FC<AdminContentProps> = ({ currentAdmin }) => {
         switch (pathname) {
             case '/admin/dashboard':
                 return <Dashboard />;
-            case '/admin/users':
-                return <Users />;
+            case '/admin/admin-management':
+                return <AdminManagement />;
+            case '/admin/users-management':
+                return <UsersManagement />;
             case '/admin/listings':
                 return <Listings />;
             case '/admin/transactions':
                 return <Transactions />;
-            case '/admin/reviews':
-                return <Reviews />;
             case '/admin/statistics':
                 return <Statistics />;
             case '/admin/myaccount':

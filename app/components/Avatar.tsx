@@ -11,10 +11,10 @@ const Avatar: React.FC<AvatarProps> = ({
     src,
     size = 30
 }) => {
-    return ( 
+    return (
         <div
             style={{ width: size, height: size }}
-            className="rounded-full overflow-hidden"
+            className="rounded-full overflow-hidden flex items-center justify-center"
         >
             <Image
                 className="rounded-full"
@@ -22,10 +22,10 @@ const Avatar: React.FC<AvatarProps> = ({
                 width={size}
                 alt="Avatar"
                 src={src || "/images/placeholder.jpg"}
-                objectFit="cover"
+                style={{ objectFit: "cover" }}
             />
         </div>
-     );
+    );
 }
- 
+
 export default Avatar;

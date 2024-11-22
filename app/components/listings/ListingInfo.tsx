@@ -2,12 +2,12 @@
 
 import { IconType } from "react-icons";
 import dynamic from "next/dynamic";
-
 import useCountries from "@/app/hooks/useCountries";
 import { SafeUser } from "@/app/types";
-
 import Avatar from "../Avatar";
 import ListingCategory from "./ListingCategory";
+import { Button } from "antd";
+import { MessageOutlined } from '@ant-design/icons';
 
 const Map = dynamic(() => import("../Map"), {
     ssr: false
@@ -37,7 +37,6 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
     locationValue
 }) => {
     const { getByValue } = useCountries();
-
     const coordinates = getByValue(locationValue)?.latlng;
 
     return (
@@ -55,6 +54,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
                 >
                     <div>Hosted by {user?.name}</div>
                     <Avatar src={user?.image} />
+                    <Button icon={<MessageOutlined />} onClick={() => {}}>Chat with {user?.name}</Button>
                 </div>
                 <div
                     className="
