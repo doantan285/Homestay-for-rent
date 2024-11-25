@@ -7,6 +7,7 @@ import ClientOnly from "@/app/components/ClientOnly";
 import EmptyState from "@/app/components/EmptyState";
 
 import ListingClient from "./ListingClient";
+import getMessages from "@/app/actions/getMessage";
 
 interface IPrams {
     listingId?: string;
@@ -17,11 +18,7 @@ const ListingPage = async ({ params }: { params: IPrams }) => {
     const reservations = await getReservations(params);
     const currentUser = await getCurrentUser();
     const reviews = await getReviews(params);
-
-    // console.log("listing", listing);
-    // console.log("reservation", reservations);
-    // console.log("currentuser",currentUser);
-    // console.log("reviews",reviews);
+    const messages = await getMessages() || [];
 
     if (!listing) {
         return (
@@ -38,6 +35,7 @@ const ListingPage = async ({ params }: { params: IPrams }) => {
                 reservations={reservations}
                 currentUser={currentUser}
                 reviews={reviews}
+                messages={messages}
             />
         </ClientOnly>
     );

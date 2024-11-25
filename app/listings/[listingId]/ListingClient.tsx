@@ -6,16 +6,15 @@ import axios from "axios";
 import { eachDayOfInterval, differenceInCalendarDays } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 import { Safelisting, SafeReservation, SafeReview, SafeUser } from "@/app/types";
 import { categories } from "@/app/components/navbar/Categories";
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
-
 import useLoginModal from "@/app/hooks/useLoginModal";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 import ListingRate from "@/app/components/listings/ListingRate";
+import ChatModal from "@/app/components/modals/ChatModal";
 
 const initialDateRange = {
     startDate: new Date(),
@@ -30,16 +29,62 @@ interface ListingClientProps {
     };
     currentUser: SafeUser | null;
     reviews: SafeReview[];
+    messages: any[] | null;
 }
 
 const ListingClient: React.FC<ListingClientProps> = ({
     listing,
     reservations = [],
     currentUser,
-    reviews = []
+    reviews = [],
+    messages = []
 }) => {
     const loginModal = useLoginModal();
     const router = useRouter();
+    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+    const [contact, setContact] = useState<{ id: string; name: string; image: string } | null>(null);
+    const [filteredMessages, setFilteredMessages] = useState<any[]>([]);
+
+    const handleOpenChat = () => {
+        if (!currentUser) {
+            toast.error("Please log in to chat.");
+            return;
+        }
+
+        const host = {
+            id: listing.user.id,
+            name: listing.user.name || "Unknown User",
+            image: listing.user.image || "",
+        };
+
+        // const relatedMessages = (messages || []).filter((msg) =>
+        //     (msg.senderId === currentUser.id && msg.receiverId === host.id) ||
+        //     (msg.senderId === host.id && msg.receiverId === currentUser.id)
+        // );
+
+        const relatedMessages = (messages || [])
+        .filter(
+            (msg) =>
+                msg.sender &&
+                msg.sender.id &&
+                msg.receiverId &&
+                ((msg.sender.id === currentUser.id && msg.receiverId === host.id) ||
+                    (msg.sender.id === host.id && msg.receiverId === currentUser.id))
+        )
+        .map((msg) => ({
+            ...msg,
+            sender: {
+                ...msg.sender,
+                id: msg.sender.id || "unknown", // Gán giá trị mặc định nếu thiếu
+            },
+        }));
+
+        setContact(host);
+        setFilteredMessages(relatedMessages);
+        setIsChatModalOpen(true);
+    };
+
+    const handleCloseChatModal = () => setIsChatModalOpen(false);
 
     const disabledDates = useMemo(() => {
         let dates: Date[] = [];
@@ -73,17 +118,17 @@ const ListingClient: React.FC<ListingClientProps> = ({
             endDate: dateRange.endDate,
             listingId: listing?.id
         })
-        .then(() => {
-            toast.success('Listing reserved!');
-            setDateRange(initialDateRange);
-            router.push('/reservations');
-        })
-        .catch(() => {
-            toast.error('Something went wrong!');
-        })
-        .finally(() => {
-            setIsLoading(false);
-        })
+            .then(() => {
+                toast.success('Listing reserved!');
+                setDateRange(initialDateRange);
+                router.push('/reservations');
+            })
+            .catch(() => {
+                toast.error('Something went wrong!');
+            })
+            .finally(() => {
+                setIsLoading(false);
+            })
     }, [
         totalPrice,
         dateRange,
@@ -133,6 +178,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                     ">
                         <ListingInfo
                             user={listing.user}
+                            onOpenChat={handleOpenChat}
                             category={category}
                             description={listing.description}
                             roomCount={listing.roomCount}
@@ -163,6 +209,15 @@ const ListingClient: React.FC<ListingClientProps> = ({
                         reviews={reviews}
                     />
                 </div>
+                {isChatModalOpen && contact && (
+                    <ChatModal
+                        currentUser={currentUser}
+                        contact={contact} // Chủ nhà
+                        messages={filteredMessages}
+                        setMessages={setFilteredMessages}
+                        onClose={handleCloseChatModal}
+                    />
+                )}
             </div>
         </Container>
     );

@@ -4,17 +4,16 @@ import { List, Avatar, Input, Card, Button } from 'antd';
 import { SafeUser } from '@/app/types';
 import { CloseOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import ChatModal from '../modals/ChatModal';
 
 interface ContactListProps {
     onClose: () => void;
+    onContactClick: (contact: any, messages: any[]) => void;
     currentUser: SafeUser | null;
     message: any[];
 }
 
-const ContactList: React.FC<ContactListProps> = ({ onClose, currentUser, message }) => {
+const ContactList: React.FC<ContactListProps> = ({ onClose, currentUser, message, onContactClick }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedContact, setSelectedContact] = useState<any | null>(null);
 
     const filteredMessages = message.filter((msg) =>
         msg.sender.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -69,21 +68,8 @@ const ContactList: React.FC<ContactListProps> = ({ onClose, currentUser, message
                 (m.receiver.id === contact.id && m.sender.id === currentUser?.id)
         );
 
-        setSelectedContact({ contact, messages: contactMessages });
+        onContactClick(contact, contactMessages); // Truyền dữ liệu qua prop
     };
-
-    const handleCloseChat = () => setSelectedContact(null);
-
-    if (selectedContact) {
-        return (
-            <ChatModal
-                currentUser={currentUser}
-                contact={selectedContact.contact}
-                messages={selectedContact.messages}
-                onClose={handleCloseChat}
-            />
-        );
-    }
 
     return (
         <Card
@@ -97,6 +83,7 @@ const ContactList: React.FC<ContactListProps> = ({ onClose, currentUser, message
                 right: 24,
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                 borderRadius: '8px',
+                zIndex: 9999,
             }}
         >
             <div className="flex flex-col w-full h-[450px]">

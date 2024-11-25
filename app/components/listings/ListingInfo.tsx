@@ -15,6 +15,7 @@ const Map = dynamic(() => import("../Map"), {
 
 interface ListingInfoProps {
     user: SafeUser;
+    onOpenChat: () => void;
     description: string;
     guestCount: number;
     roomCount: number;
@@ -29,6 +30,7 @@ interface ListingInfoProps {
 
 const ListingInfo: React.FC<ListingInfoProps> = ({
     user,
+    onOpenChat,
     description,
     guestCount,
     roomCount,
@@ -54,7 +56,12 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
                 >
                     <div>Hosted by {user?.name}</div>
                     <Avatar src={user?.image} />
-                    <Button icon={<MessageOutlined />} onClick={() => {}}>Chat with {user?.name}</Button>
+                    <Button
+                        icon={<MessageOutlined />}
+                        onClick={onOpenChat}
+                    >
+                        Chat with {user?.name}
+                    </Button>
                 </div>
                 <div
                     className="

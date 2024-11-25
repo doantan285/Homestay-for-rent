@@ -15,23 +15,45 @@ interface FloatChatButtonProps {
 const FloatChatButton: React.FC<FloatChatButtonProps> = (
     { currentUser, message }
 ) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isContactListOpen, setIsContactListOpen] = useState(false);
+    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+    const [selectedContact, setSelectedContact] = useState<any | null>(null);
+    const [messages, setMessages] = useState<any[]>(message); // State lưu tin nhắn
 
-    const handleToggle = () => setIsModalOpen((prev) => !prev);
+    const handleToggleContactList = () => setIsContactListOpen((prev) => !prev);
+
+    const handleContactClick = (contact: any, messages: any[]) => {
+        setSelectedContact({ contact, messages });
+        setIsChatModalOpen(true); // Hiển thị ChatModal
+        setIsContactListOpen(false); // Đóng ContactList
+    };
+
+    const handleCloseChatModal = () => setIsChatModalOpen(false);
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999]">
-            {isModalOpen ? (
+            {isContactListOpen ? (
                 <ContactList
-                    onClose={handleToggle}
+                    onClose={handleToggleContactList} // Đóng ContactList
                     currentUser={currentUser}
                     message={message}
+                    onContactClick={handleContactClick} // Gọi khi chọn contact
                 />
             ) : (
                 <FloatButton
                     icon={<MessageOutlined />}
                     type="primary"
-                    onClick={handleToggle}
+                    onClick={handleToggleContactList} // Mở ContactList
+                    className='z-[9999]'
+                />
+            )}
+            {isChatModalOpen && selectedContact && (
+                <ChatModal
+                    currentUser={currentUser}
+                    contact={selectedContact.contact}
+                    messages={selectedContact.messages}
+                    onClose={handleCloseChatModal} // Đóng ChatModal
+                    setMessages={setMessages} // Cập nhật tin nhắn
                 />
             )}
         </div>
