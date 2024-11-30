@@ -1,37 +1,29 @@
 'use client';
 
 import Image from "next/image";
-
-import useCountries from "@/app/hooks/useCountries";
-import { SafeUser } from "@/app/types";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Safelisting, SafeUser } from "@/app/types";
 
 import Heading from "../Heading";
 import HeartButton from "../HeartButton";
 
 interface ListingHeadProps {
-    title: string;
-    imageSrc: string;
-    locationValue: string;
-    id: string;
+    listing: Safelisting;
     currentUser?: SafeUser | null;
 }
 
 const ListingHead: React.FC<ListingHeadProps> = ({
-    title,
-    imageSrc,
-    locationValue,
-    id,
+    listing,
     currentUser
 }) => {
-    const { getByValue } = useCountries();
-
-    const location = getByValue(locationValue);
-
-    return ( 
+    return (
         <>
             <Heading
-                title={title}
-                subtitle={`${location?.region}, ${location?.label}`}
+                title={listing.title}
+                subtitle={`${listing?.locationValue}, ${listing.ward}, ${listing.district}, ${listing.province}`}
             />
             <div
                 className="
@@ -42,21 +34,32 @@ const ListingHead: React.FC<ListingHeadProps> = ({
                     relative
                 "
             >
-                <Image
-                    alt="Image"
-                    src={imageSrc}
-                    fill
-                    className="object-cover w-full"
-                />
+                <Swiper
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    loop
+                    className="h-full"
+                >
+                    {listing.imageSrc.map((src, index) => (
+                        <SwiperSlide key={index}>
+                            <Image
+                                alt={`Image ${index + 1}`}
+                                src={src}
+                                fill
+                                className="object-cover w-full"
+                            />
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
                 <div className="absolute top-5 right-5">
                     <HeartButton
-                        listingId={id}
+                        listingId={listing.id}
                         currentUser={currentUser}
                     />
                 </div>
             </div>
         </>
-     );
+    );
 }
- 
+
 export default ListingHead;

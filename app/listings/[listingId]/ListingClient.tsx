@@ -57,27 +57,22 @@ const ListingClient: React.FC<ListingClientProps> = ({
             image: listing.user.image || "",
         };
 
-        // const relatedMessages = (messages || []).filter((msg) =>
-        //     (msg.senderId === currentUser.id && msg.receiverId === host.id) ||
-        //     (msg.senderId === host.id && msg.receiverId === currentUser.id)
-        // );
-
         const relatedMessages = (messages || [])
-        .filter(
-            (msg) =>
-                msg.sender &&
-                msg.sender.id &&
-                msg.receiverId &&
-                ((msg.sender.id === currentUser.id && msg.receiverId === host.id) ||
-                    (msg.sender.id === host.id && msg.receiverId === currentUser.id))
-        )
-        .map((msg) => ({
-            ...msg,
-            sender: {
-                ...msg.sender,
-                id: msg.sender.id || "unknown", // Gán giá trị mặc định nếu thiếu
-            },
-        }));
+            .filter(
+                (msg) =>
+                    msg.sender &&
+                    msg.sender.id &&
+                    msg.receiverId &&
+                    ((msg.sender.id === currentUser.id && msg.receiverId === host.id) ||
+                        (msg.sender.id === host.id && msg.receiverId === currentUser.id))
+            )
+            .map((msg) => ({
+                ...msg,
+                sender: {
+                    ...msg.sender,
+                    id: msg.sender.id || "unknown", // Gán giá trị mặc định nếu thiếu
+                },
+            }));
 
         setContact(host);
         setFilteredMessages(relatedMessages);
@@ -129,14 +124,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
             .finally(() => {
                 setIsLoading(false);
             })
-    }, [
-        totalPrice,
-        dateRange,
-        listing?.id,
-        router,
-        currentUser,
-        loginModal
-    ]);
+    }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
     useEffect(() => {
         if (dateRange.startDate && dateRange.endDate) {
@@ -163,10 +151,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
             <div className="max-w-screen-lg mx-auto">
                 <div className="flex flex-col gap-6">
                     <ListingHead
-                        title={listing.title}
-                        imageSrc={listing.imageSrc}
-                        locationValue={listing.locationValue}
-                        id={listing.id}
+                        listing={listing}
                         currentUser={currentUser}
                     />
                     <div className="
@@ -184,7 +169,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
                             roomCount={listing.roomCount}
                             guestCount={listing.guestCount}
                             bathroomCount={listing.bathroomCount}
-                            locationValue={listing.locationValue}
                         />
                         <div
                             className="

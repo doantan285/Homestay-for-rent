@@ -42,7 +42,7 @@ const BarChart = () => {
       tooltip: {
         callbacks: {
           // Hiển thị thêm thông tin khi hover
-          label: (context: TooltipItem<'bar'>) => `Revenue: $${context.raw}`,
+          label: (context: TooltipItem<'bar'>) => `Revenue: ${context.raw} ₫`,
         },
       },
     },
@@ -58,7 +58,7 @@ const BarChart = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold text-center mb-4">Total Revenue: ${totalRevenue}</h2>
+      <h2 className="text-xl font-bold text-center mb-4">Total Revenue: {totalRevenue} ₫</h2>
       <Bar data={chartData} options={options} />
     </div>
   );

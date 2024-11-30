@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 
 import { Safelisting, SafeReservation, SafeUser } from "@/app/types";
-import useCountries from "@/app/hooks/useCountries";
 import useRentModal from "@/app/hooks/useRentModal";
 import { format } from "date-fns";
 import HeartButton from "../HeartButton";
@@ -40,9 +39,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
     currentUser,
 }) => {
     const router = useRouter();
-    const { getByValue } = useCountries();
-    const location = getByValue(data.locationValue);
     const rentModal = useRentModal();
+
+    const formatPrice = (price: number): string => {
+        return new Intl.NumberFormat("vi-VN").format(price);
+    };
 
     const handleDelete = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -118,7 +119,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     <Image
                         fill
                         alt="Listing"
-                        src={data.imageSrc}
+                        src={data.imageSrc[0]}
                         className="
                             object-cover
                             h-full
@@ -134,15 +135,16 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         />
                     </div>
                 </div>
-                <div className="font-semibold text-lg">
-                    {location?.region}, {location?.label}
+                <div className="font-semibold text-lg">{data?.title}</div>
+                <div className="font-semibold text-xs">
+                    {data?.province}, {data?.district}, {data?.ward}
                 </div>
                 <div className="font-light text-neutral-500">
                     {reservationDate || data.category}
                 </div>
                 <div className="flex flex-row items-center gap-1">
                     <div className="font-semibold">
-                        $ {price}
+                        {formatPrice(price)} ₫
                     </div>
                     {!reservation && (
                         <div className="font-light">/ night</div>

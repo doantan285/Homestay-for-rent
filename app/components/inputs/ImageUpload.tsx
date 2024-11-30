@@ -2,32 +2,54 @@
 
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { TbPhotoPlus } from "react-icons/tb";
+import { AiOutlineClose } from "react-icons/ai";
 
 declare global {
     var cloudinary: any;
 }
 
 interface ImageUploadProps {
-    onChange: (value: string) => void;
-    value: string;
+    onChange: (value: string[]) => void;
+    value: string[];
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
     onChange,
-    value
+    value = [],
 }) => {
-    const handleUpload = useCallback((result: any) => {
-        onChange(result.info.secure_url);
-    }, [onChange]);
+    const [images, setImages] = useState<string[]>(value);
+
+    const handleUpload = useCallback(
+        (result: any) => {
+            const newImage = result.info.secure_url;
+            
+            setImages(prevImages => {
+                const updatedImages = [...prevImages, newImage];
+                onChange(updatedImages);
+                return updatedImages;
+            });
+        },
+        [onChange]
+    );
+
+    const handleRemove = useCallback(
+        (url: string) => {
+            const updatedImages = images.filter((item) => item !== url);
+            setImages(updatedImages);
+            onChange(updatedImages);
+        },
+        [onChange, images]
+    );
 
     return (
         <CldUploadWidget
             onSuccess={handleUpload}
             uploadPreset="dhvggtyg"
             options={{
-                maxFiles: 1
+                maxFiles: 5,
+                multiple: true
             }}
         >
             {({ open }) => {
@@ -55,18 +77,25 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         <div className="font-semibold text-lg">
                             CLick to upload
                         </div>
-                        {value && (
+                        {value.map((url) => (
                             <div
-                                className="absolute inset-0 w-full h-full"
+                                key={url}
+                                className="relative w-full h-32 border rounded-lg overflow-hidden"
                             >
                                 <Image
-                                    alt="Upload"
+                                    alt="Uploaded image"
+                                    src={url}
                                     fill
-                                    style={{ objectFit: 'cover' }}
-                                    src={value}
+                                    style={{ objectFit: "cover" }}
                                 />
+                                <button
+                                    onClick={() => handleRemove(url)}
+                                    className="absolute top-1 right-1 bg-white rounded-full p-1 shadow"
+                                >
+                                    <AiOutlineClose size={20} />
+                                </button>
                             </div>
-                        )}
+                        ))}
                     </div>
                 )
             }}

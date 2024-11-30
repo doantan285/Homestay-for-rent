@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import getListing from "@/app/actions/getListings";
 
 export async function POST(
     request: Request
@@ -22,7 +21,10 @@ export async function POST(
         roomCount,
         bathroomCount,
         guestCount,
-        location,
+        province,
+        district,
+        ward,
+        locationValue,
         price,
     } = body;
 
@@ -41,7 +43,10 @@ export async function POST(
             roomCount,
             bathroomCount,
             guestCount,
-            locationValue: location.value,
+            locationValue,
+            province,
+            district,
+            ward,
             price: parseInt(price, 10),
             userId: currentUser.id
         },

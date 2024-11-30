@@ -15,6 +15,11 @@ const ListingsTable: React.FC = () => {
     const [searchText, setSearchText] = useState<string>('');
     const [filter, setFilter] = useState<string>('All');
 
+    const formatPrice = (price?: number): string => {
+        if (!price) return "0";
+        return new Intl.NumberFormat("vi-VN").format(price);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -70,7 +75,7 @@ const ListingsTable: React.FC = () => {
                         <div className='flex justify-between'>Rooms: <strong>{listing?.roomCount}</strong></div>
                         <div className='flex justify-between'>Bathrooms: <strong>{listing?.bathroomCount}</strong></div>
                         <div className='flex justify-between'>Guests: <strong>{listing?.guestCount}</strong></div>
-                        <div className='flex justify-between'>Price: <strong>${listing?.price}</strong></div>
+                        <div className='flex justify-between'>Price: <strong>{formatPrice(listing?.price)}₫</strong></div>
                     </div>
                 );
             },

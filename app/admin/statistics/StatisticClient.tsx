@@ -11,7 +11,7 @@ const StatisticClient = () => {
                 subtitle="Statistics and reporting for system revenue"
             />
             <div>
-                <StatisticTable />
+                {/* <StatisticTable /> */}
 
             </div>
         </div>

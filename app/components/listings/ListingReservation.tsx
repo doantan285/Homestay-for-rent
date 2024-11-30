@@ -24,6 +24,10 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
     disabled,
     disabledDates
 }) => {
+    const formatPrice = (price: number): string => {
+        return new Intl.NumberFormat("vi-VN").format(price);
+    };
+
     return ( 
         <div
             className="
@@ -38,7 +42,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
                 flex flex-row items-center gap-1 p-4
             ">
                 <div className="text-2xl font-semibold">
-                    $ {price}
+                    {formatPrice(price)} ₫
                 </div>
                 <div className="font-light text-neutral-600">
                     / night
@@ -73,7 +77,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
                     Total
                 </div>
                 <div>
-                    $ {totalPrice}
+                    {formatPrice(totalPrice)} ₫
                 </div>
             </div>
         </div>

@@ -1,20 +1,17 @@
 'use client';
 
-import { formatISO } from "date-fns";
+import { formatISO, set } from "date-fns";
 import qs from "query-string";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Range } from "react-date-range";
-import dynamic from "next/dynamic";
-
+import Select from "react-select";
 import Modal from "./Modal";
-import { CountrySelectValue } from "../inputs/CountrySelect";
 import Heading from "../Heading";
-import CountrySelect from "../inputs/CountrySelect";
 import Calendar from "../inputs/Calendar";
 import Counter from "../inputs/Counter";
-
 import useSearchModal from "@/app/hooks/useSearchModal";
+import axios from "axios";
 
 enum STEPS {
     LOCATION = 0,
@@ -27,7 +24,6 @@ const SearchModal = () => {
     const params = useSearchParams();
     const searchModal = useSearchModal();
 
-    const [location, setLocation] = useState<CountrySelectValue>();
     const [step, setStep] = useState(STEPS.LOCATION);
     const [guestCount, setGuestCount] = useState(1);
     const [roomCount, setRoomCount] = useState(1);
@@ -38,9 +34,66 @@ const SearchModal = () => {
         key: 'selection'
     });
 
-    const Map = useMemo(() => dynamic(() => import('../Map'), {
-        ssr: false,
-    }), [location]);
+    const [province, setProvince] = useState<{ label: string; value: string; districts: any[] } | null>(null);
+    const [district, setDistrict] = useState<{ label: string; value: string; wards: any[] } | null>(null);
+    const [ward, setWard] = useState<{ label: string; value: string } | null>(null);
+    const [provinces, setProvinces] = useState<any[]>([]);
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [wards, setWards] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                const response = await axios.get('https://provinces.open-api.vn/api/?depth=3');
+                setProvinces(response.data);
+            } catch (error) {
+                console.error('Error fetching provinces:', error);
+            }
+        };
+
+        fetchProvinces();
+    }, []);
+
+    const provinceOptions = useMemo(() => {
+        return provinces.map((province: any) => ({
+            label: province.name,
+            value: province.code,
+            districts: province.districts,
+        }));
+    }, [provinces]);
+
+    const districtOptions = useMemo(() => {
+        return districts.map((district: any) => ({
+            label: district.name,
+            value: district.code,
+            wards: district.wards,
+        }));
+    }, [districts]);
+
+    const wardOptions = useMemo(() => {
+        return wards.map((ward: any) => ({
+            label: ward.name,
+            value: ward.code,
+        }));
+    }, [wards]);
+
+    const handleProvinceChange = useCallback((selectedOption: any) => {
+        setProvince(selectedOption); // Lưu đối tượng đã chọn
+        setDistrict(null); // Reset district khi thay đổi province
+        setWard(null); // Reset ward khi thay đổi province
+        setDistricts(selectedOption?.districts || []); // Cập nhật danh sách districts
+        setWards([]); // Xóa danh sách wards
+    }, []);
+
+    const handleDistrictChange = useCallback((selectedOption: any) => {
+        setDistrict(selectedOption); // Lưu đối tượng đã chọn
+        setWard(null); // Reset ward khi thay đổi district
+        setWards(selectedOption?.wards || []); // Cập nhật danh sách wards
+    }, []);
+
+    const handleWardChange = useCallback((selectedOption: any) => {
+        setWard(selectedOption); // Lưu đối tượng đã chọn
+    }, []);
 
     const onBack = useCallback(() => {
         setStep((value) => value - 1);
@@ -63,10 +116,15 @@ const SearchModal = () => {
 
         const updatedQuery: any = {
             ...currentQuery,
-            locationValue: location?.value,
+            province: province?.label, // Lưu tên tỉnh
+            provinceCode: province?.value, // Lưu mã tỉnh
+            district: district?.label,
+            districtCode: district?.value,
+            ward: ward?.label,
+            wardCode: ward?.value,
             guestCount,
             roomCount,
-            bathroomCount
+            bathroomCount,
         };
 
         if (dateRange.startDate) {
@@ -87,18 +145,20 @@ const SearchModal = () => {
 
         router.push(url);
     },
-    [
-        step,
-        searchModal,
-        location,
-        router,
-        guestCount,
-        roomCount,
-        bathroomCount,
-        dateRange,
-        onNext,
-        params
-    ]);
+        [
+            step,
+            searchModal,
+            province,
+            district,
+            ward,
+            router,
+            guestCount,
+            roomCount,
+            bathroomCount,
+            dateRange,
+            onNext,
+            params
+        ]);
 
     const actionLabel = useMemo(() => {
         if (step === STEPS.INFO) {
@@ -122,14 +182,41 @@ const SearchModal = () => {
                 title="Where you wanna go?"
                 subtitle="Find the perfect location!"
             />
-            <CountrySelect
-                value={location}
-                onChange={(value) => 
-                    setLocation(value as CountrySelectValue)
-                }
+            <Select
+                options={provinceOptions}
+                placeholder="Province"
+                onChange={handleProvinceChange}
+                value={province} // Giá trị hiện tại của province
+                classNames={{
+                    control: () => 'p-3 border-2',
+                    input: () => 'text-lg',
+                    option: () => 'text-lg',
+                }}
             />
-            <hr />
-            <Map center={location?.latlng} />
+
+            <Select
+                options={districtOptions}
+                placeholder="District"
+                onChange={handleDistrictChange}
+                value={district} // Giá trị hiện tại của district
+                classNames={{
+                    control: () => 'p-3 border-2',
+                    input: () => 'text-lg',
+                    option: () => 'text-lg',
+                }}
+            />
+
+            <Select
+                options={wardOptions}
+                placeholder="Ward"
+                onChange={handleWardChange}
+                value={ward} // Giá trị hiện tại của ward
+                classNames={{
+                    control: () => 'p-3 border-2',
+                    input: () => 'text-lg',
+                    option: () => 'text-lg',
+                }}
+            />
         </div>
     )
 

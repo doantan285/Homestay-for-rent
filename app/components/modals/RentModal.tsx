@@ -2,14 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-
 import useRentModal from "@/app/hooks/useRentModal";
-
 import Modal from "./Modal";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
-import CountrySelect from "../inputs/CountrySelect";
 import dynamic from "next/dynamic";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
@@ -17,6 +14,7 @@ import Input from "../inputs/Input";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import LocationSelect from "../inputs/LocationSelect";
 
 enum STEPS {
     CATEGORY = 0,
@@ -30,7 +28,6 @@ enum STEPS {
 const RentModal = () => {
     const router = useRouter();
     const rentModal = useRentModal();
-
     const [step, setStep] = useState(STEPS.CATEGORY);
     const [isLoading, setIsLoading] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -45,11 +42,14 @@ const RentModal = () => {
     } = useForm<FieldValues>({
         defaultValues: {
             category: '',
-            location: null,
+            locationValue: '',
+            province: '',
+            district: '',
+            ward: '',
             guestCount: 1,
             roomCount: 1,
             bathroomCount: 1,
-            imageSrc: '',
+            imageSrc: [],
             price: 1,
             title: '',
             description: ''
@@ -67,7 +67,10 @@ const RentModal = () => {
             setIsUpdating(true);
             reset({
                 category: rentModal.listing.category,
-                location: rentModal.listing.locationValue,
+                locationValue: rentModal.listing.locationValue,
+                province: rentModal.listing.province,
+                district: rentModal.listing.district,
+                ward: rentModal.listing.ward,
                 guestCount: rentModal.listing.guestCount,
                 roomCount: rentModal.listing.roomCount,
                 bathroomCount: rentModal.listing.bathroomCount,
@@ -81,17 +84,15 @@ const RentModal = () => {
         }
     }, [rentModal.listing, reset]);
 
-
     const category = watch('category');
-    const location = watch('location');
+    const province = watch('province');
+    const district = watch('district');
+    const ward = watch('ward');
+    const locationValue = watch('locationValue');
     const guestCount = watch('guestCount');
     const roomCount = watch('roomCount');
     const bathroomCount = watch('bathroomCount');
     const imageSrc = watch('imageSrc');
-
-    const Map = useMemo(() => dynamic(() => import('../Map'), {
-        ssr: false
-    }), []);
 
     const setCustomValue = (id: string, value: any) => {
         setValue(id, value, {
@@ -135,7 +136,7 @@ const RentModal = () => {
                 toast.error('Listing is missing!');
                 return;
             }
-            
+
             axios.put(`/api/listings/${rentModal.listing.id}`, data)
                 .then(() => {
                     toast.success('Listing Updated!');
@@ -192,8 +193,7 @@ const RentModal = () => {
                 {categories.map((item) => (
                     <div key={item.label} className="col-span-1">
                         <CategoryInput
-                            onClick={(category) =>
-                                setCustomValue('category', category)}
+                            onClick={(category) => setCustomValue('category', category)}
                             selected={category === item.label}
                             label={item.label}
                             icon={item.icon}
@@ -211,12 +211,17 @@ const RentModal = () => {
                     title="Where is your place located?"
                     subtitle="Help guests find you!"
                 />
-                <CountrySelect
-                    value={location}
-                    onChange={(value) => setCustomValue('location', value)}
-                />
-                <Map
-                    center={location?.latlng}
+                <LocationSelect
+                    province={province}
+                    district={district}
+                    ward={ward}
+                    locationValue={locationValue}
+                    onChange={({ province, district, ward, locationValue }) => {
+                        setCustomValue('province', province);
+                        setCustomValue('district', district);
+                        setCustomValue('ward', ward);
+                        setCustomValue('locationValue', locationValue);
+                    }}
                 />
             </div>
         )

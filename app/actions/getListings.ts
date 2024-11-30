@@ -7,7 +7,9 @@ export interface IListingsParams {
     bathroomCount?: number;
     startDate?: string;
     endDate?: string;
-    locationValue?: string;
+    province?: string;
+    district?: string;
+    ward?: string;
     category?: string;
 }
 
@@ -22,19 +24,16 @@ export default async function getListing(
             bathroomCount,
             startDate,
             endDate,
-            locationValue,
+            province,
+            district,
+            ward,
             category
         } = params;
 
         let query: any = {};
 
-        if (userId) {
-            query.userId = userId;
-        }
-
-        if (category) {
-            query.category = category;
-        }
+        if (userId) query.userId = userId;
+        if (category) query.category = category;
 
         if (roomCount) {
             query.roomCount = {
@@ -54,9 +53,9 @@ export default async function getListing(
             }
         }
 
-        if (locationValue) {
-            query.locationValue = locationValue; 
-        }
+        if (province) query.province = province;
+        if (district) query.district = district;
+        if (ward) query.ward = ward;
 
         if (startDate && endDate) {
             query.NOT = {

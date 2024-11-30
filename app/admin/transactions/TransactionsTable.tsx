@@ -54,26 +54,26 @@ const TransactionsTable = () => {
             key: 'transactionDate',
         },
         {
-            title: 'Amount ($)',
+            title: 'Amount',
             dataIndex: 'amount',
             key: 'amount',
-            render: (amount: number) => <strong>{amount.toFixed(2)}</strong>,
+            render: (amount: number) => <strong>{amount.toFixed(2)} ₫</strong>,
         },
         {
             title: `Service Fee (${serviceFeePercentage}%)`,
             key: 'serviceFee',
             render: (_, record) => {
                 const serviceFee = (record.amount * serviceFeePercentage) / 100;
-                return <strong>{serviceFee.toFixed(2)}</strong>;
+                return <strong>{serviceFee.toFixed(2)} ₫</strong>;
             },
         },
         {
-            title: 'Money Paid',
-            key: 'moneyPaid',
+            title: 'Host Payout',
+            key: 'hostPayout',
             render: (_, record) => {
                 const serviceFee = (record.amount * serviceFeePercentage) / 100;
-                const moneyPaid = record.amount - serviceFee;
-                return <strong>{moneyPaid.toFixed(2)}</strong>;
+                const hostPayout = record.amount - serviceFee;
+                return <strong>{hostPayout.toFixed(2)} ₫</strong>;
             },
         },
         {
