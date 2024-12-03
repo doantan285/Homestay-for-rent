@@ -26,6 +26,7 @@ export async function POST(
         ward,
         locationValue,
         price,
+        replacementPrice,
     } = body;
 
     Object.keys(body).forEach((value: any) => {
@@ -48,6 +49,7 @@ export async function POST(
             district,
             ward,
             price: parseInt(price, 10),
+            replacementPrice: parseInt(replacementPrice, 10),
             userId: currentUser.id
         },
     });

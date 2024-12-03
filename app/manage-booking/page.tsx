@@ -9,8 +9,6 @@ const ManageBookingPage = async () => {
     const currentUser = await getCurrentUser();
     const reservations = await getReservations({ hostId: currentUser?.id });
 
-    // console.log(reservations);
-
     if (!currentUser) {
         return (
             <ClientOnly>

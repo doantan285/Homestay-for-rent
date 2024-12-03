@@ -7,7 +7,7 @@ interface IParams {
     listingId?: string;
 }
 
-export async function DELETE (
+export async function DELETE(
     request: Request,
     { params }: { params: IParams }
 ) {
@@ -24,7 +24,7 @@ export async function DELETE (
     }
 
     const listing = await prisma.listing.deleteMany({
-        where:{
+        where: {
             id: listingId,
             userId: currentUser.id
         }
@@ -33,7 +33,7 @@ export async function DELETE (
     return NextResponse.json(listing);
 }
 
-export async function PUT (
+export async function PUT(
     request: Request,
     { params }: { params: IParams }
 ) {
@@ -53,8 +53,11 @@ export async function PUT (
         roomCount,
         bathroomCount,
         guestCount,
-        location,
+        province,
+        district,
+        ward,
         price,
+        replacementPrice
     } = body;
 
     if (!listingId) {
@@ -73,8 +76,11 @@ export async function PUT (
             roomCount,
             bathroomCount,
             guestCount,
-            locationValue: location.value,
+            province,
+            district,
+            ward,
             price: parseInt(price, 10),
+            replacementPrice: parseInt(replacementPrice, 10),
             userId: currentUser.id
         },
     });

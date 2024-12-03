@@ -2,6 +2,7 @@ import axios from "axios";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { formatDistanceToNow } from "date-fns";
 
 interface AccountInformationProps {
     title: string;
@@ -142,15 +143,16 @@ const AccountInformation: React.FC<AccountInformationProps> = ({
                                 </button>
                             </div>
                         </div>
-                    ) : (
-                        updateField === "password" ? (
-                            passwordLastUpdated
-                                ? `Last updated ${passwordLastUpdated.toLocaleDateString()}`
-                                : "Password not updated yet"
-                            
+                    ) : updateField === "password" ? (
+                        lastPasswordUpdated ? (
+                            `Password updated ${formatDistanceToNow(lastPasswordUpdated, {
+                                addSuffix: true,
+                            })}`
                         ) : (
-                            newContent
+                            "Password not updated yet"
                         )
+                    ) : (
+                        content
                     )}
                 </div>
             </div>

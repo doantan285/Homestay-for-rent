@@ -77,9 +77,14 @@ const AdminAccountClient: React.FC<AdminAccountClientProps> = ({
                     />
                     <AdminAccountInformation
                         title="Password"
-                        content="Last updated 2 days ago"
+                        content=""
                         actionLabel="Change"
                         updateField="password"
+                        lastPasswordUpdated={
+                            currentAdmin?.lastPasswordUpdated
+                                ? new Date(currentAdmin.lastPasswordUpdated)
+                                : null
+                        }
                     />
                     <AdminAccountInformation
                         title="Name"

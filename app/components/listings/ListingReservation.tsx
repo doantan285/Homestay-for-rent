@@ -7,6 +7,7 @@ import Button from "../Button";
 
 interface ListingReservationProps {
     price: number;
+    replacementPrice?: number | null;
     dateRange: Range;
     totalPrice: number;
     onChangeDate: (value: Range) => void;
@@ -17,6 +18,7 @@ interface ListingReservationProps {
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
     price,
+    replacementPrice,
     dateRange,
     totalPrice,
     onChangeDate,
@@ -28,7 +30,11 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
         return new Intl.NumberFormat("vi-VN").format(price);
     };
 
-    return ( 
+    const finalPrice = replacementPrice != null && replacementPrice > 0
+        ? replacementPrice
+        : price;
+
+    return (
         <div
             className="
                 bg-white
@@ -42,7 +48,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
                 flex flex-row items-center gap-1 p-4
             ">
                 <div className="text-2xl font-semibold">
-                    {formatPrice(price)} ₫
+                    {formatPrice(finalPrice)} ₫
                 </div>
                 <div className="font-light text-neutral-600">
                     / night
@@ -81,7 +87,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
                 </div>
             </div>
         </div>
-     );
+    );
 }
- 
+
 export default ListingReservation;

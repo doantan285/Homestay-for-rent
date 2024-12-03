@@ -43,7 +43,7 @@ const ListingsTable: React.FC = () => {
                 <Image
                     width={40}
                     height={40}
-                    src={image || placeholder.src}
+                    src={image[0] || placeholder.src}
                     alt="Homestay"
                     style={{ borderRadius: '8px' }}
                 />
@@ -55,35 +55,40 @@ const ListingsTable: React.FC = () => {
             key: 'title',
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
-        {
             title: 'Category',
             dataIndex: 'category',
             key: 'category',
         },
         {
             title: 'Information',
-            dataIndex: 'id',
             key: 'information',
-            render: (id: string) => {
-                const listing = listings.find((listing) => listing.id === id);
-                return (
-                    <div>
-                        <div className='flex justify-between'>Rooms: <strong>{listing?.roomCount}</strong></div>
-                        <div className='flex justify-between'>Bathrooms: <strong>{listing?.bathroomCount}</strong></div>
-                        <div className='flex justify-between'>Guests: <strong>{listing?.guestCount}</strong></div>
-                        <div className='flex justify-between'>Price: <strong>{formatPrice(listing?.price)}₫</strong></div>
-                    </div>
-                );
-            },
+            render: (_, record) => (
+                <div>
+                    <div className='flex justify-between'>Rooms: <strong>{record.roomCount}</strong></div>
+                    <div className='flex justify-between'>Bathrooms: <strong>{record.bathroomCount}</strong></div>
+                    <div className='flex justify-between'>Guests: <strong>{record.guestCount}</strong></div>
+                </div>
+            ),
+        },
+        {
+            title: 'Price',
+            key: 'price',
+            render: (_, record) => (
+                <div>
+                    <div className='flex justify-between'>Default: <strong className='text-blue-500'>{formatPrice(record.price)}₫</strong></div>
+                    <div className='flex justify-between'>Replacement: <strong className='text-rose-500'>{record.replacementPrice}₫</strong></div>
+                </div>
+            ),
         },
         {
             title: 'Location',
-            dataIndex: 'locationValue',
-            key: 'locationValue',
+            key: 'location',
+            render: (_, record) => (
+                <div>
+                    <div>{record.province || 'N/A'}, {record.district || 'N/A'}, {record.ward || 'N/A'}</div>
+                    <div>{record.locationValue || 'N/A'}</div>
+                </div>
+            ),
         },
         {
             title: 'Owner',
@@ -140,7 +145,7 @@ const ListingsTable: React.FC = () => {
         <div className='pt-2 max-h-[400px]'>
             <Space style={{ marginBottom: 8 }}>
                 <Input
-                    placeholder="Search by name or email"
+                    placeholder="Search by title or owner"
                     value={searchText}
                     onChange={handleSearch}
                     style={{ width: 200 }}
@@ -163,7 +168,7 @@ const ListingsTable: React.FC = () => {
                 dataSource={filteredData}
                 rowKey="id"
                 pagination={{
-                    pageSize: 3,
+                    pageSize: 4,
                     showSizeChanger: false,
                     position: ['bottomCenter'],
                 }}

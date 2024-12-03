@@ -84,9 +84,14 @@ const AccountClient: React.FC<AccountClientProps> = ({
                     />
                     <AccountInformation
                         title="Password"
-                        content="Last updated 2 days ago"
+                        content=""
                         actionLabel="Change"
                         updateField="password"
+                        lastPasswordUpdated={
+                            currentUser?.lastPasswordUpdated
+                                ? new Date(currentUser.lastPasswordUpdated)
+                                : null
+                        }
                     />
                     <AccountInformation
                         title="Name"

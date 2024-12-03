@@ -7,7 +7,6 @@ import Modal from "./Modal";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
-import dynamic from "next/dynamic";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
 import Input from "../inputs/Input";
@@ -51,6 +50,7 @@ const RentModal = () => {
             bathroomCount: 1,
             imageSrc: [],
             price: 1,
+            replacementPrice: 0,
             title: '',
             description: ''
         }
@@ -76,6 +76,7 @@ const RentModal = () => {
                 bathroomCount: rentModal.listing.bathroomCount,
                 imageSrc: rentModal.listing.imageSrc,
                 price: rentModal.listing.price,
+                replacementPrice: rentModal.listing.replacementPrice,
                 title: rentModal.listing.title,
                 description: rentModal.listing.description,
             });
@@ -317,6 +318,17 @@ const RentModal = () => {
                     register={register}
                     errors={errors}
                     required
+                />
+                <hr />
+                <Input
+                    id="replacementPrice"
+                    label="Replacement Price (Optional)"
+                    formatPrice
+                    type="number"
+                    disabled={isLoading}
+                    register={register}
+                    errors={errors}
+                    required={false} // Không bắt buộc
                 />
             </div>
         )

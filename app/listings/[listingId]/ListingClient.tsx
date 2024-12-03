@@ -133,13 +133,17 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 dateRange.startDate
             );
 
-            if (dayCount && listing.price) {
-                setTotalPrice(dayCount * listing.price);
+            const finalPrice = listing.replacementPrice && listing.replacementPrice > 0 
+                ? listing.replacementPrice 
+                : listing.price;
+
+            if (dayCount && finalPrice) {
+                setTotalPrice(dayCount * finalPrice);
             } else {
-                setTotalPrice(listing.price);
+                setTotalPrice(finalPrice);
             }
         }
-    }, [dateRange, listing.price]);
+    }, [dateRange, listing.price, listing.replacementPrice]);
 
     const category = useMemo(() => {
         return categories.find((item) =>
@@ -180,6 +184,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                         >
                             <ListingReservation
                                 price={listing.price}
+                                replacementPrice={listing.replacementPrice}
                                 totalPrice={totalPrice}
                                 onChangeDate={(value) => setDateRange(value)}
                                 dateRange={dateRange}

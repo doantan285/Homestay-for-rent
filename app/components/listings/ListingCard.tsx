@@ -99,6 +99,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
         return `${format(start, 'PP')} - ${format(end, 'PP')}`;
     }, [reservation]);
 
+    const hasReplacementPrice = data.replacementPrice !== null && data.replacementPrice > 0;
+
     return (
         <div
             onClick={() => router.push(`/listings/${data.id}`)}
@@ -142,14 +144,35 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 <div className="font-light text-neutral-500">
                     {reservationDate || data.category}
                 </div>
-                <div className="flex flex-row items-center gap-1">
-                    <div className="font-semibold">
-                        {formatPrice(price)} ₫
+                {hasReplacementPrice ? (
+                    <>
+                        <div className="flex flex-row items-center gap-1">
+                            <div className="font-semibold text-red-500">
+                                {data.replacementPrice} ₫
+                            </div>
+                            {!reservation && (
+                                <div className="font-light">/ night</div>
+                            )}
+                        </div>
+                        <div className="flex flex-row items-center gap-1 line-through">
+                            <div className="font-semibold">
+                                {formatPrice(price)} ₫
+                            </div>
+                            {!reservation && (
+                                <div className="font-light">/ night</div>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex flex-row items-center gap-1">
+                        <div className="font-semibold">
+                            {formatPrice(price)} ₫
+                        </div>
+                        {!reservation && (
+                            <div className="font-light">/ night</div>
+                        )}
                     </div>
-                    {!reservation && (
-                        <div className="font-light">/ night</div>
-                    )}
-                </div>
+                )}
                 <div className="flex flex-row gap-2">
                     {onUpdate && (
                         <Button
