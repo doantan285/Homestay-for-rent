@@ -27,6 +27,7 @@ export async function POST(
         locationValue,
         price,
         replacementPrice,
+        iframe,
     } = body;
 
     Object.keys(body).forEach((value: any) => {
@@ -48,6 +49,7 @@ export async function POST(
             province,
             district,
             ward,
+            iframe,
             price: parseInt(price, 10),
             replacementPrice: parseInt(replacementPrice, 10),
             userId: currentUser.id

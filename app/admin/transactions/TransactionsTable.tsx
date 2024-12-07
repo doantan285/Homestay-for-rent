@@ -1,32 +1,58 @@
 import { Input, Space, Table, TableProps, Select, Button } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from 'react-hot-toast';
-
-import fakeTransactionData from "@/app/fake-data/fakeTransactionData";
-
-const serviceFeePercentage = 5;
+import axios from "axios";
 
 const TransactionsTable = () => {
-    const [transactions, setTransactions] = useState(fakeTransactionData);
+    const [transactions, setTransactions] = useState<any[]>([]);
     const [searchText, setSearchText] = useState<string>('');
     const [selectedStatus, setSelectedStatus] = useState<{ [key: string]: string }>({});
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSave = (transactionId: string) => {
+    const formatPrice = (price?: number): string => {
+        if (!price) return "0";
+        return new Intl.NumberFormat("vi-VN").format(price);
+    };
+
+    const fetchTransactions = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/api/transactions');
+            setTransactions(response.data);
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+            toast.error("Failed to load transactions.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
+
+    const handleSave = async (transactionId: string) => {
         const status = selectedStatus[transactionId];
-        setTransactions((prevTransactions) =>
-            prevTransactions.map((transaction) =>
-                transaction.id === transactionId
-                    ? { ...transaction, status: status }
-                    : transaction
-            )
-        );
+        try {
+            await axios.patch(`/api/admin/transactions/${transactionId}`, { status });
+            setTransactions((prevTransactions) =>
+                prevTransactions.map((transaction) =>
+                    transaction.id === transactionId
+                        ? { ...transaction, status: status }
+                        : transaction
+                )
+            );
 
-        if (status === "paid") {
-            toast.success("The amount will be paid to the Host after 24 hour!");
-        } else if (status === "refund") {
-            toast.success("The money will be refunded to the customer within 24 hours!");
-        } else {
-            toast.success("Transaction status updated successfully!");
+            if (status === "paid") {
+                toast.success("The amount will be paid to the Host after 24 hour!");
+            } else if (status === "refund") {
+                toast.success("The money will be refunded to the customer within 24 hours!");
+            } else {
+                toast.success("Transaction status updated successfully!");
+            }
+        } catch (error) {
+            console.error("Error updating status:", error);
+            toast.error("Failed to update transaction status.");
         }
     };
 
@@ -39,42 +65,52 @@ const TransactionsTable = () => {
 
     const columns: TableProps<any>['columns'] = [
         {
-            title: 'TransactionID',
-            dataIndex: 'transactionId',
-            key: 'transactionId',
+            title: 'Transaction ID',
+            dataIndex: 'paypalTransactionId',
+            key: 'paypalTransactionId',
         },
         {
-            title: 'ReservationID',
+            title: 'Reservation ID',
             dataIndex: 'reservationId',
             key: 'reservationId',
         },
         {
             title: 'Transaction Date',
-            dataIndex: 'transactionDate',
-            key: 'transactionDate',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (createdAt: string) => 
+                new Intl.DateTimeFormat('en-CA', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }).format(new Date(createdAt)),
         },
         {
             title: 'Amount',
             dataIndex: 'amount',
             key: 'amount',
-            render: (amount: number) => <strong>{amount.toFixed(2)} ₫</strong>,
+            render: (amount: number) => <strong className="text-green-500">{formatPrice(amount)} ₫</strong>,
         },
         {
-            title: `Service Fee (${serviceFeePercentage}%)`,
+            title: 'Service Fee',
             key: 'serviceFee',
-            render: (_, record) => {
-                const serviceFee = (record.amount * serviceFeePercentage) / 100;
-                return <strong>{serviceFee.toFixed(2)} ₫</strong>;
-            },
+            render: (record: any) => (
+                <Space>
+                    <span>
+                        Service Fee ({record.serviceFeeRate}%): <strong className="text-rose-500">{formatPrice(record.serviceFee)} ₫</strong>
+                    </span>
+                </Space>
+            ),
         },
         {
             title: 'Host Payout',
-            key: 'hostPayout',
-            render: (_, record) => {
-                const serviceFee = (record.amount * serviceFeePercentage) / 100;
-                const hostPayout = record.amount - serviceFee;
-                return <strong>{hostPayout.toFixed(2)} ₫</strong>;
-            },
+            dataIndex: 'payOut',
+            key: 'payOut',
+            render: (payOut: number) => <strong className="text-blue-500">{formatPrice(payOut)} ₫</strong>
         },
         {
             title: 'Status',
@@ -105,8 +141,8 @@ const TransactionsTable = () => {
     };
 
     const filteredTransactions = transactions.filter((transaction) =>
-        transaction.transactionId.toLowerCase().includes(searchText.toLowerCase()) ||
-        transaction.reservationId.toLowerCase().includes(searchText.toLowerCase())
+        transaction.paypalTransactionId?.toLowerCase().includes(searchText.toLowerCase()) ||
+        transaction.reservationId?.toLowerCase().includes(searchText.toLowerCase())
     );
 
     return (

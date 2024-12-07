@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 
 interface AccountInformationProps {
     title: string;
@@ -19,6 +20,7 @@ const AccountInformation: React.FC<AccountInformationProps> = ({
     updateField,
     lastPasswordUpdated
 }) => {
+    const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [newContent, setNewContent] = useState(content);
     const [currentPassword, setCurrentPassword] = useState("");
@@ -65,7 +67,7 @@ const AccountInformation: React.FC<AccountInformationProps> = ({
             if (updateField === "password") {
                 setPasswordLastUpdated(new Date());
             }
-
+            router.refresh();
             setIsEditing(false);
         } catch (error) {
             toast.error(`Failed to update ${title}.`);

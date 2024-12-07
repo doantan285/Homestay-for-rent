@@ -1,8 +1,10 @@
 'use client';
 
 import { Range } from "react-date-range";
-
 import Calendar from "../inputs/Calendar";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import toast from "react-hot-toast";
+import { MutableRefObject } from "react";
 import Button from "../Button";
 
 interface ListingReservationProps {
@@ -10,8 +12,10 @@ interface ListingReservationProps {
     replacementPrice?: number | null;
     dateRange: Range;
     totalPrice: number;
+    totalPriceRef: MutableRefObject<number>;
     onChangeDate: (value: Range) => void;
     onSubmit: () => void;
+    onPaymentSuccess: (transactionId: string, details: any) => void;
     disabled?: boolean;
     disabledDates: Date[];
 }
@@ -21,10 +25,12 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
     replacementPrice,
     dateRange,
     totalPrice,
+    totalPriceRef,
     onChangeDate,
     onSubmit,
+    onPaymentSuccess,
     disabled,
-    disabledDates
+    disabledDates,
 }) => {
     const formatPrice = (price: number): string => {
         return new Intl.NumberFormat("vi-VN").format(price);
@@ -62,6 +68,43 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
             />
             <hr />
             <div className="p-4">
+                <PayPalScriptProvider
+                    options={{
+                        "clientId": process.env.PAYPAL_CLIENT_ID || "",
+                        currency: "USD",
+                    }}
+                >
+                    <PayPalButtons
+                        style={{ layout: "vertical" }}
+                        createOrder={(data, actions) => {
+                            return actions.order.create({
+                                intent: "CAPTURE",
+                                purchase_units: [
+                                    {
+                                        amount: {
+                                            currency_code: "USD",
+                                            value: (totalPriceRef.current / 25000).toFixed(2),
+                                        },
+                                    },
+                                ],
+                            });
+                        }}
+                        onApprove={async (data, actions) => {
+                            if (actions?.order) {
+                                const details = await actions.order.capture();
+                                const transactionId = details.id as string;
+                                await onPaymentSuccess(transactionId, details);
+                            } else {
+                                console.error("actions.order is undefined");
+                                toast.error("Payment failed.");
+                            }
+                        }}
+                        onError={(error) => {
+                            console.error("Payment failed:", error);
+                            toast.error("Payment failed. Please try again.");
+                        }}
+                    />
+                </PayPalScriptProvider>
                 <Button
                     disabled={disabled}
                     label="Reserve"

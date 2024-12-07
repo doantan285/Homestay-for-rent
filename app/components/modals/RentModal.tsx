@@ -52,7 +52,8 @@ const RentModal = () => {
             price: 1,
             replacementPrice: 0,
             title: '',
-            description: ''
+            description: '',
+            iframe: ''
         }
     });
 
@@ -79,6 +80,7 @@ const RentModal = () => {
                 replacementPrice: rentModal.listing.replacementPrice,
                 title: rentModal.listing.title,
                 description: rentModal.listing.description,
+                iframe: rentModal.listing.iframe
             });
         } else {
             setIsUpdating(false);
@@ -94,6 +96,7 @@ const RentModal = () => {
     const roomCount = watch('roomCount');
     const bathroomCount = watch('bathroomCount');
     const imageSrc = watch('imageSrc');
+    const iframe = watch('iframe');
 
     const setCustomValue = (id: string, value: any) => {
         setValue(id, value, {
@@ -217,11 +220,13 @@ const RentModal = () => {
                     district={district}
                     ward={ward}
                     locationValue={locationValue}
-                    onChange={({ province, district, ward, locationValue }) => {
+                    iframe={iframe}
+                    onChange={({ province, district, ward, locationValue, iframe }) => {
                         setCustomValue('province', province);
                         setCustomValue('district', district);
                         setCustomValue('ward', ward);
                         setCustomValue('locationValue', locationValue);
+                        setCustomValue('iframe', iframe);
                     }}
                 />
             </div>

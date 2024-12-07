@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import { VscArrowSmallRight } from "react-icons/vsc";
 
 type Ward = {
     name: string;
@@ -26,6 +27,7 @@ export type LocationSelectValue = {
     district: string;
     ward: string;
     locationValue: string;
+    iframe: string;
 };
 
 interface LocationSelectProps {
@@ -33,6 +35,7 @@ interface LocationSelectProps {
     district: string;
     ward: string;
     locationValue: string;
+    iframe: string;
     onChange: (value: LocationSelectValue) => void;
 }
 
@@ -41,6 +44,7 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
     district,
     ward,
     locationValue,
+    iframe,
     onChange,
 }) => {
     const [provinces, setProvinces] = useState<Province[]>([]);
@@ -95,8 +99,9 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             district: '',
             ward: '',
             locationValue: '',
+            iframe,
         });
-    }, [onChange]);
+    }, [onChange, iframe]);
 
     const handleDistrictChange = useCallback((selectedOption: any) => {
         const districtName = selectedOption?.label || '';
@@ -110,8 +115,9 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             district: districtName,
             ward: '',
             locationValue: '',
+            iframe,
         });
-    }, [onChange, selectedProvince]);
+    }, [onChange, selectedProvince, iframe]);
 
     const handleWardChange = useCallback((selectedOption: any) => {
         const wardName = selectedOption?.label || '';
@@ -121,8 +127,9 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             district: selectedDistrict || '',
             ward: wardName,
             locationValue,
+            iframe,
         });
-    }, [onChange, selectedProvince, selectedDistrict, locationValue]);
+    }, [onChange, selectedProvince, selectedDistrict, locationValue, iframe]);
 
     const handleLocationValueChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         onChange({
@@ -130,13 +137,24 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             district: selectedDistrict || '',
             ward: ward || '',
             locationValue: event.target.value,
+            iframe,
         });
-    }, [onChange, selectedProvince, selectedDistrict, ward]);
+    }, [onChange, selectedProvince, selectedDistrict, ward, iframe]);
+
+    const handleIframeChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        onChange({
+            province: selectedProvince || '',
+            district: selectedDistrict || '',
+            ward: ward || '',
+            locationValue,
+            iframe: event.target.value, // Cập nhật iframe URL
+        });
+    }, [onChange, selectedProvince, selectedDistrict, ward, locationValue]);
 
     return (
         <div className='flex flex-col gap-2'>
             <Select
-                placeholder="Chọn tỉnh/thành phố"
+                placeholder="Select province"
                 options={provinces.map((province) => ({
                     label: province.name,
                     value: province.code,
@@ -153,7 +171,7 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             />
             {districts.length > 0 && (
                 <Select
-                    placeholder="Chọn quận/huyện"
+                    placeholder="Select district"
                     options={districts.map((district) => ({
                         label: district.name,
                         value: district.code,
@@ -171,7 +189,7 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
             )}
             {wards.length > 0 && (
                 <Select
-                    placeholder="Chọn phường/xã"
+                    placeholder="Select ward"
                     options={wards.map((ward) => ({
                         label: ward.name,
                         value: ward.code,
@@ -190,9 +208,28 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
                 type="text"
                 value={locationValue || ''}
                 onChange={handleLocationValueChange}
-                placeholder="Nhập địa chỉ chi tiết"
+                placeholder="Enter detailed address"
                 className="p-3 border-2 rounded text-lg"
             />
+            <input
+                type="text"
+                value={iframe || ''}
+                onChange={handleIframeChange} // Cập nhật URL iframe
+                placeholder="Enter URL iframe Google Maps"
+                className="p-3 border-2 rounded text-lg mt-2"
+            />
+            <div>
+                <p className='text-s text-rose-300'>How to get iframe from google map?</p>
+                <div className='flex text-xs text-rose-300 items-center'>
+                    <p>Enter location on Google Maps</p>
+                    <VscArrowSmallRight />
+                    <p>Select Share</p>
+                    <VscArrowSmallRight />
+                    <p>select embed map</p>
+                    <VscArrowSmallRight />
+                    <p>Copy HTML</p>
+                </div>
+            </div>
         </div>
     );
 };

@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { eachDayOfInterval, differenceInCalendarDays } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Safelisting, SafeReservation, SafeReview, SafeUser } from "@/app/types";
 import { categories } from "@/app/components/navbar/Categories";
 import Container from "@/app/components/Container";
@@ -99,6 +99,16 @@ const ListingClient: React.FC<ListingClientProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [totalPrice, setTotalPrice] = useState(listing.price);
     const [dateRange, setDateRange] = useState<Range>(initialDateRange);
+    const totalPriceRef = useRef(totalPrice);
+    const dateRangeRef = useRef<Range>(initialDateRange);
+
+    useEffect(() => {
+        totalPriceRef.current = totalPrice;
+    }, [totalPrice]);
+
+    useEffect(() => {
+        dateRangeRef.current = dateRange;
+    }, [dateRange]);
 
     const onCreateReservation = useCallback(() => {
         if (!currentUser) {
@@ -126,6 +136,35 @@ const ListingClient: React.FC<ListingClientProps> = ({
             })
     }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
+    const handlePaymentSuccess = async (transactionId: string, paymentDetails: any) => {
+        try {
+            const reservationResponse = await axios.post('/api/reservations/reservation', {
+                totalPrice: totalPriceRef.current,
+                startDate: dateRangeRef.current.startDate,
+                endDate: dateRangeRef.current.endDate,
+                listingId: listing?.id,
+            });
+
+            const reservationId = reservationResponse.data.id;
+
+            await axios.post('/api/transactions', {
+                transactionId,
+                amount: totalPriceRef.current,
+                serviceFeeRate: 5.0,
+                reservationId: reservationId,
+                paymentMethod: "PayPal",
+                userId: currentUser?.id,
+                paymentDetails,
+            });
+
+            router.push('/reservations');
+            toast.success("Payment and reservation successful!");
+        } catch (error) {
+            console.error("Error saving transaction:", error);
+            toast.error("An error occurred while processing the payment.");
+        }
+    };
+
     useEffect(() => {
         if (dateRange.startDate && dateRange.endDate) {
             const dayCount = differenceInCalendarDays(
@@ -133,8 +172,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 dateRange.startDate
             );
 
-            const finalPrice = listing.replacementPrice && listing.replacementPrice > 0 
-                ? listing.replacementPrice 
+            const finalPrice = listing.replacementPrice && listing.replacementPrice > 0
+                ? listing.replacementPrice
                 : listing.price;
 
             if (dayCount && finalPrice) {
@@ -173,6 +212,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                             roomCount={listing.roomCount}
                             guestCount={listing.guestCount}
                             bathroomCount={listing.bathroomCount}
+                            iframe={listing.iframe}
                         />
                         <div
                             className="
@@ -186,9 +226,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
                                 price={listing.price}
                                 replacementPrice={listing.replacementPrice}
                                 totalPrice={totalPrice}
+                                totalPriceRef={totalPriceRef} // Truyền ref
                                 onChangeDate={(value) => setDateRange(value)}
                                 dateRange={dateRange}
                                 onSubmit={onCreateReservation}
+                                onPaymentSuccess={handlePaymentSuccess}
                                 disabled={isLoading}
                                 disabledDates={disabledDates}
                             />

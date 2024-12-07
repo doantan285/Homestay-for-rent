@@ -56,6 +56,7 @@ export async function PUT(
         province,
         district,
         ward,
+        iframe,
         price,
         replacementPrice
     } = body;
@@ -79,6 +80,7 @@ export async function PUT(
             province,
             district,
             ward,
+            iframe,
             price: parseInt(price, 10),
             replacementPrice: parseInt(replacementPrice, 10),
             userId: currentUser.id

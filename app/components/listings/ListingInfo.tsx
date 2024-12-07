@@ -1,16 +1,11 @@
 'use client';
 
 import { IconType } from "react-icons";
-import dynamic from "next/dynamic";
 import { SafeUser } from "@/app/types";
 import Avatar from "../Avatar";
 import ListingCategory from "./ListingCategory";
 import { Button } from "antd";
 import { MessageOutlined } from '@ant-design/icons';
-
-const Map = dynamic(() => import("../Map"), {
-    ssr: false
-});
 
 interface ListingInfoProps {
     user: SafeUser;
@@ -24,6 +19,7 @@ interface ListingInfoProps {
         label: string;
         description: string;
     } | undefined;
+    iframe: string | null;
 }
 
 const ListingInfo: React.FC<ListingInfoProps> = ({
@@ -34,6 +30,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
     roomCount,
     bathroomCount,
     category,
+    iframe
 }) => {
     return (
         <div className="col-span-4 flex flex-col gap-8">
@@ -91,6 +88,11 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
                 {description}
             </div>
             <hr />
+            <div>
+                {iframe && (
+                    <div dangerouslySetInnerHTML={{ __html: iframe }} />
+                )}
+            </div>
         </div>
     );
 }

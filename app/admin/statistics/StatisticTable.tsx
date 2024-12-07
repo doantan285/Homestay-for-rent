@@ -1,13 +1,12 @@
 'use client';
 
 import { Input, Space, Table, TableProps } from "antd";
-import fakeStatistics from "@/app/fake-data/fakeStatistic";
-import TotalStatistics from "./TotalStatistics";
+import fakeStatistics from "../../fake-data/fakeStatistics";
 
 const StatisticTable = () => {
     const columns: TableProps['columns'] = [
         {
-            title: 'Date',
+            title: 'Period Of Time',
             dataIndex: 'date',
             key: 'date',
         },
@@ -17,7 +16,12 @@ const StatisticTable = () => {
             key: 'userRegistration',
         },
         {
-            title: 'Number of bookings',
+            title: 'Number Of Homestays',
+            dataIndex: 'userRegistration',
+            key: 'userRegistration',
+        },
+        {
+            title: 'Number Of Bookings',
             dataIndex: 'numberOfBookings',
             key: 'numberOfBookings',
         },
@@ -25,26 +29,16 @@ const StatisticTable = () => {
             title: 'Revenue',
             dataIndex: 'revenue',
             key: 'revenue',
-            render: (value: number) => <strong>{value.toLocaleString()} ₫</strong>,
         },
         {
             title: 'Service Fee',
             dataIndex: 'serviceFee',
             key: 'serviceFee',
-            render: (revenue: number) => {
-                const serviceFee = revenue * 0.05; // Tính service fee là 5% của revenue
-                return <strong>{serviceFee.toLocaleString()} ₫</strong>;
-            },
         },
         {
             title: 'Host Payout',
             dataIndex: 'hostPayout',
             key: 'hostPayout',
-            render: (revenue: number) => {
-                const serviceFee = revenue * 0.05; // Tính service fee
-                const hostPayout = revenue - serviceFee; // Tiền trả chủ nhà = revenue - service fee
-                return <strong>{hostPayout.toLocaleString()} ₫</strong>;
-            },
         },
     ];
 
@@ -75,7 +69,6 @@ const StatisticTable = () => {
                     position: ['bottomCenter'],
                 }}
             />
-            {/* <TotalStatistics data={fakeData} /> */}
         </div>
     );
 };

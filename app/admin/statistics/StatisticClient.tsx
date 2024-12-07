@@ -1,6 +1,7 @@
 'use client';
 
 import Heading from "@/app/components/Heading";
+import TotalStatistics from "./TotalStatistics";
 import StatisticTable from "./StatisticTable";
 
 const StatisticClient = () => {
@@ -11,8 +12,8 @@ const StatisticClient = () => {
                 subtitle="Statistics and reporting for system revenue"
             />
             <div>
+                <TotalStatistics />
                 {/* <StatisticTable /> */}
-
             </div>
         </div>
      );

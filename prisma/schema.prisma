@@ -88,6 +88,7 @@ model Listing {
   userId           String   @db.ObjectId
   price            Int // Giá gốc
   replacementPrice Int? // Giá thay thế (có thể null)
+  iframe           String? // Mã nhúng từ Google Map
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations Reservation[]
@@ -149,12 +150,16 @@ model Notification {
 }
 
 model Transaction {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  reservationId String   @db.ObjectId
-  amount        Int // Số tiền giao dịch
-  paymentMethod String // Phương thức thanh toán: PayPal, Credit Card, etc.
-  status        String // Trạng thái giao dịch: pending, paid, refund
-  createdAt     DateTime @default(now())
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  paypalTransactionId String? // Id giao dịch PayPal
+  reservationId       String   @db.ObjectId
+  amount              Int // Số tiền giao dịch
+  serviceFee          Int // Phí dịch vụ (số tiền cụ thể)
+  serviceFeeRate      Float    @default(5.0) // Tỷ lệ phí dịch vụ (%), mặc định 5%
+  payOut              Int // Số tiền trả về cho chủ nhà
+  paymentMethod       String // Phương thức thanh toán: PayPal, Credit Card, etc.
+  status              String // Trạng thái giao dịch: pending, paid, refund
+  createdAt           DateTime @default(now())
 
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 }
