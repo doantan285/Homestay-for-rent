@@ -13,7 +13,7 @@ const StatisticClient = () => {
             />
             <div>
                 <TotalStatistics />
-                {/* <StatisticTable /> */}
+                <StatisticTable />
             </div>
         </div>
      );

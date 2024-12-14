@@ -1,14 +1,14 @@
-import Heading from "@/app/components/Heading";
-import ListingsTable from "./ListingsTable";
+import ListingsClient from "./ListingsClient";
+import { SafeAdmin } from "@/app/types";
 
-const Listings = () => {
+interface ListingsProps {
+    currentAdmin: SafeAdmin | null;
+}
+
+const Listings: React.FC<ListingsProps> = ({currentAdmin}) => {
     return ( 
         <div>
-            <Heading
-                title="Homestay list management"
-                subtitle="Manage the homestay list in the website"
-            />
-            <ListingsTable />
+            <ListingsClient currentAdmin={currentAdmin} />
         </div>
      );
 }

@@ -1,24 +1,39 @@
-// app/components/listings/ListingRate.tsx
 'use client';
 
-import { SafeReview } from "@/app/types";
+import { SafeReview, SafeAdmin } from "@/app/types";
 import Avatar from "../Avatar";
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { AiFillStar } from "react-icons/ai";
+import { AiFillStar, AiOutlineDelete } from "react-icons/ai";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface ListingRateProps {
     reviews: SafeReview[];
+    currentAdmin?: SafeAdmin | null;
 }
 
 const ListingRate: React.FC<ListingRateProps> = (
-    { reviews }
+    { reviews, currentAdmin }
 ) => {
+    const router = useRouter();
+
     const averageRating = useMemo(() => {
         if (reviews.length === 0) return "0.0";
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
         return (totalRating / reviews.length).toFixed(1);
     }, [reviews]);
+
+    const handleDelete = async (reviewId: string) => {
+        try {
+            await axios.delete(`/api/admin/listings/review/${reviewId}`);
+            toast.success('Review deleted successfully');
+            router.refresh();
+        } catch (error) {
+            toast.error('Failed to delete review');
+        }
+    };
 
     return (
         <div className="col-span-4 flex flex-col gap-6">
@@ -42,6 +57,12 @@ const ListingRate: React.FC<ListingRateProps> = (
                                         {format(new Date(review.createdAt), "MMM d, yyyy")}
                                     </div>
                                 </div>
+                                {currentAdmin && (
+                                    <AiOutlineDelete 
+                                        className="text-red-500 cursor-pointer ml-auto"
+                                        onClick={() => handleDelete(review.id)}
+                                    />
+                                )}
                             </div>
                             <div className="flex items-center gap-1">
                                 {[...Array(review.rating)].map((_, index) => (

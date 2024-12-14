@@ -18,6 +18,7 @@ interface ListingReservationProps {
     onPaymentSuccess: (transactionId: string, details: any) => void;
     disabled?: boolean;
     disabledDates: Date[];
+    isOwner: boolean;
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
@@ -31,6 +32,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
     onPaymentSuccess,
     disabled,
     disabledDates,
+    isOwner,
 }) => {
     const formatPrice = (price: number): string => {
         return new Intl.NumberFormat("vi-VN").format(price);
@@ -68,7 +70,14 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
             />
             <hr />
             <div className="p-4">
-                <PayPalScriptProvider
+                {isOwner ? (
+                    <Button
+                    disabled={disabled}
+                    label="Reserve"
+                    onClick={onSubmit}
+                />
+                ):(
+<PayPalScriptProvider
                     options={{
                         "clientId": process.env.PAYPAL_CLIENT_ID || "",
                         currency: "USD",
@@ -105,11 +114,8 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
                         }}
                     />
                 </PayPalScriptProvider>
-                <Button
-                    disabled={disabled}
-                    label="Reserve"
-                    onClick={onSubmit}
-                />
+                )}
+                
             </div>
             <div
                 className="

@@ -1,23 +1,23 @@
+'use client';
+
 import React, { useMemo, useEffect, useState } from "react";
-import { DatePicker, Select, Space } from "antd";
+import { Select, Space } from "antd";
+import axios from "axios";
+import { useStatisticsContext } from "./StatisticsContext";
+
 const { Option } = Select;
-const { RangePicker } = DatePicker;
-import axios from "axios"; // Dùng axios để gọi API backend
 
-interface TotalStatisticsProps { }
-
-const TotalStatistics: React.FC<TotalStatisticsProps> = () => {
+const TotalStatistics = () => {
   const [statistics, setStatistics] = useState({
     userRegistration: 0,
+    numberOfHomestays: 0,
     numberOfBookings: 0,
     revenue: 0,
     profit: 0,
     payout: 0,
-    numberOfHomestays: 0,
   });
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedYear, setSelectedYear] = useState<string>("all");
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const { selectedYear, selectedMonth, setSelectedYear, setSelectedMonth, setData } = useStatisticsContext();
 
   const handleYearChange = (value: string) => {
     setSelectedYear(value);
@@ -27,6 +27,46 @@ const TotalStatistics: React.FC<TotalStatisticsProps> = () => {
   const handleMonthChange = (value: string) => {
     setSelectedMonth(value);
   };
+
+  useEffect(() => {
+    const generateTableData = async () => {
+      if (selectedYear === "all") {
+        setData([
+          {
+            date: "All",
+            userRegistration: statistics.userRegistration,
+            numberOfHomestays: statistics.numberOfHomestays,
+            numberOfBookings: statistics.numberOfBookings,
+            revenue: statistics.revenue,
+            profit: statistics.profit,
+            payout: statistics.payout,
+          },
+        ]);
+      } else if (selectedMonth === "all") {
+        try {
+          const response = await axios.get("/api/admin/statistics/", {
+            params: { year: selectedYear, month: "all" },
+          });
+          setData(response.data.monthlyData);
+          setStatistics(response.data.totalStatistics);
+        } catch (error) {
+          console.error("Error fetching monthly statistics:", error);
+        }
+      } else {
+        try {
+          const response = await axios.get("/api/admin/statistics/", {
+            params: { year: selectedYear, month: selectedMonth },
+          });
+          setData(response.data.dailyData);
+          setStatistics(response.data.totalStatistics);
+        } catch (error) {
+          console.error("Error fetching daily statistics:", error);
+        }
+      }
+    };
+
+    generateTableData();
+  }, [selectedYear, selectedMonth, setData, statistics]);
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -108,7 +148,7 @@ const TotalStatistics: React.FC<TotalStatisticsProps> = () => {
             className="flex gap-2 items-center bg-gray-100 px-4 py-2 rounded-md shadow-md"
           >
             <p className="font-bold text-rose-500 text-lg">{stat.label}:</p>
-            <span className="text-gray-800 text-lg">
+            <span className="text-gray-800 text-lg font-bold">
               {stat.value !== undefined ? stat.value.toLocaleString() : "0"}
               {stat.isCurrency ? " ₫" : ""}
             </span>

@@ -189,6 +189,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
             item.label === listing.category);
     }, [listing.category]);
 
+    const isOwner = currentUser?.id === listing.user.id;
+
     return (
         <Container>
             <div className="max-w-screen-lg mx-auto">
@@ -233,6 +235,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                                 onPaymentSuccess={handlePaymentSuccess}
                                 disabled={isLoading}
                                 disabledDates={disabledDates}
+                                isOwner={isOwner}
                             />
                         </div>
                     </div>

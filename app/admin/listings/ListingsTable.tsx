@@ -3,20 +3,29 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Input, Space, Table, Image, Select } from 'antd';
 import type { TableProps } from 'antd';
-import { Safelisting, SafeUser } from '@/app/types';
+import { Safelisting, SafeReview, SafeUser, SafeAdmin } from '@/app/types';
 import axios from 'axios';
 import placeholder from '@/public/images/placeholder.jpg';
 import toast from 'react-hot-toast';
 import { categories } from '@/app/components/navbar/Categories';
+import Modal from '@/app/components/modals/Modal';
+import ListingRate from '@/app/components/listings/ListingRate';
 
-const ListingsTable: React.FC = () => {
+interface ListingsTableProps {
+    currentAdmin: SafeAdmin | null;
+}
+
+const ListingsTable: React.FC<ListingsTableProps> = ({currentAdmin}) => {
     const [listings, setListings] = useState<Safelisting[]>([]);
     const [users, setUsers] = useState<SafeUser[]>([]);
     const [searchText, setSearchText] = useState<string>('');
     const [filter, setFilter] = useState<string>('All');
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedListing, setSelectedListing] = useState<Safelisting | null>(null);
+    const [reviews, setReviews] = useState<SafeReview[]>([]);
 
-    const formatPrice = (price?: number): string => {
-        if (!price) return "0";
+    const formatPrice = (price?: number | null): string => {
+        if (price == null) return "0";
         return new Intl.NumberFormat("vi-VN").format(price);
     };
 
@@ -33,6 +42,24 @@ const ListingsTable: React.FC = () => {
         };
         fetchData();
     }, []);
+
+    const handleView = async (listing: Safelisting) => {
+        setSelectedListing(listing);
+        setIsModalVisible(true);
+        try {
+            const reviewsResponse = await axios.get(`/api/review?listingId=${listing.id}`);
+            setReviews(reviewsResponse.data);
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+            toast.error('Failed to fetch reviews');
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+        setSelectedListing(null);
+        setReviews([]);
+    };
 
     const columns: TableProps<Safelisting>['columns'] = [
         {
@@ -76,7 +103,7 @@ const ListingsTable: React.FC = () => {
             render: (_, record) => (
                 <div>
                     <div className='flex justify-between'>Default: <strong className='text-blue-500'>{formatPrice(record.price)}₫</strong></div>
-                    <div className='flex justify-between'>Replacement: <strong className='text-rose-500'>{record.replacementPrice}₫</strong></div>
+                    <div className='flex justify-between'>Replacement: <strong className='text-rose-500'>{formatPrice(record.replacementPrice)}₫</strong></div>
                 </div>
             ),
         },
@@ -104,6 +131,9 @@ const ListingsTable: React.FC = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
+                    <Button type="primary" onClick={() => handleView(record)}>
+                        View
+                    </Button>
                     <Button danger onClick={() => handleDelete(record.id)}>
                         Delete
                     </Button>
@@ -173,6 +203,20 @@ const ListingsTable: React.FC = () => {
                     position: ['bottomCenter'],
                 }}
             />
+            {selectedListing && (
+                <Modal
+                    isOpen={isModalVisible}
+                    onClose={handleCloseModal}
+                    title={`Reviews of ${selectedListing.title}`}
+                    actionLabel="Close"
+                    onSubmit={handleCloseModal}
+                    body={
+                        <div>
+                            <ListingRate reviews={reviews} currentAdmin={currentAdmin} />
+                        </div>
+                    }
+                />
+            )}
         </div>
     );
 };

@@ -16,7 +16,6 @@ interface AdminContentProps {
 
 const AdminContent: React.FC<AdminContentProps> = ({ currentAdmin }) => {
     const pathname = usePathname();
-
     const renderContent = () => {
         switch (pathname) {
             case '/admin/dashboard':
@@ -26,7 +25,7 @@ const AdminContent: React.FC<AdminContentProps> = ({ currentAdmin }) => {
             case '/admin/users-management':
                 return <UsersManagement />;
             case '/admin/listings':
-                return <Listings />;
+                return <Listings currentAdmin={currentAdmin} />;
             case '/admin/transactions':
                 return <Transactions />;
             case '/admin/statistics':

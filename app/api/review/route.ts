@@ -37,3 +37,39 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function GET(request: Request) {
+    try {
+        const url = new URL(request.url);
+        const listingId = url.searchParams.get('listingId');
+
+        if (!listingId) {
+            return NextResponse.json({ message: 'Listing ID is required' }, { status: 400 });
+        }
+
+        const reviews = await prisma.review.findMany({
+            where: { listingId },
+            include: {
+                user: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+
+        const safeReviews = reviews.map((review) => ({
+            ...review,
+            user: {
+                id: review.user.id,
+                name: review.user.name,
+                image: review.user.image,
+            },
+            createdAt: review.createdAt.toISOString(),
+        }));
+
+        return NextResponse.json(safeReviews);
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    }
+}

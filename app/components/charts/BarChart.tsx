@@ -18,7 +18,11 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 import fakeDashboard from "@/app/fake-data/fakeDashboard";
 
 const BarChart = () => {
-  // Chuẩn bị dữ liệu từ fakeDashboard
+  const formatPrice = (price?: number): string => {
+    if (!price) return "0";
+    return new Intl.NumberFormat("vi-VN").format(price);
+  };
+
   const chartData = {
     labels: fakeDashboard.map((item) => item.day), // Gán labels là các ngày
     datasets: [
@@ -58,7 +62,7 @@ const BarChart = () => {
 
   return (
     <div className="w-full max-w-lg mx-auto p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold text-center mb-4">Total Revenue: {totalRevenue} ₫</h2>
+      <h2 className="text-xl font-bold text-center mb-4">Total Revenue: {formatPrice(totalRevenue)} ₫</h2>
       <Bar data={chartData} options={options} />
     </div>
   );

@@ -1,52 +1,31 @@
 'use client';
 
 import { Input, Space, Table, TableProps } from "antd";
-import fakeStatistics from "../../fake-data/fakeStatistics";
+import { useStatisticsContext } from "./StatisticsContext";
 
 const StatisticTable = () => {
-    const columns: TableProps['columns'] = [
-        {
-            title: 'Period Of Time',
-            dataIndex: 'date',
-            key: 'date',
-        },
-        {
-            title: 'User Registration',
-            dataIndex: 'userRegistration',
-            key: 'userRegistration',
-        },
-        {
-            title: 'Number Of Homestays',
-            dataIndex: 'userRegistration',
-            key: 'userRegistration',
-        },
-        {
-            title: 'Number Of Bookings',
-            dataIndex: 'numberOfBookings',
-            key: 'numberOfBookings',
-        },
-        {
-            title: 'Revenue',
-            dataIndex: 'revenue',
-            key: 'revenue',
-        },
-        {
-            title: 'Service Fee',
-            dataIndex: 'serviceFee',
-            key: 'serviceFee',
-        },
-        {
-            title: 'Host Payout',
-            dataIndex: 'hostPayout',
-            key: 'hostPayout',
-        },
+    const { data } = useStatisticsContext();
+
+    const formatPrice = (price?: number): string => {
+        if (!price) return "0";
+        return new Intl.NumberFormat("vi-VN").format(price);
+    };
+
+    const columns = [
+        { title: "Period Of Time", dataIndex: "date", key: "date" },
+        { title: "User Registration", dataIndex: "userRegistration", key: "userRegistration" },
+        { title: "Number Of Homestays", dataIndex: "numberOfHomestays", key: "numberOfHomestays" },
+        { title: "Number Of Bookings", dataIndex: "numberOfBookings", key: "numberOfBookings" },
+        { title: "Revenue", dataIndex: "revenue", key: "revenue", render: (revenue: number) => <strong className="text-green-500">{formatPrice(revenue)} ₫</strong>, },
+        { title: "Profit", dataIndex: "profit", key: "profit", render: (profit: number) => <strong className="text-rose-500">{formatPrice(profit)} ₫</strong>, },
+        { title: "Payout", dataIndex: "payout", key: "payout", render: (payout: number) => <strong className="text-blue-500">{formatPrice(payout)} ₫</strong>, },
     ];
 
     return (
         <div className="pt-2 max-h-[400px]">
             <Space
                 style={{
-                    marginBottom: 8,
+                    marginTop: 12,
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
@@ -61,10 +40,10 @@ const StatisticTable = () => {
             </Space>
             <Table
                 columns={columns}
-                dataSource={fakeStatistics}
-                rowKey="id"
+                dataSource={data}
+                rowKey="date"
                 pagination={{
-                    pageSize: 6,
+                    pageSize: 5,
                     showSizeChanger: false,
                     position: ['bottomCenter'],
                 }}

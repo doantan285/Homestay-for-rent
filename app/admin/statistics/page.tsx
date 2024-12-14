@@ -1,9 +1,12 @@
 import StatisticClient from "./StatisticClient";
+import { StatisticsProvider } from "./StatisticsContext";
 
-const Statistics = () => {
-    return ( 
-        <StatisticClient />
-     );
-}
- 
-export default Statistics;
+const StatisticsPage = async () => {
+    return (
+        <StatisticsProvider>
+            <StatisticClient />
+        </StatisticsProvider>
+    );
+};
+
+export default StatisticsPage;

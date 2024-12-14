@@ -89,3 +89,43 @@ export async function PUT(
 
     return NextResponse.json(updatedListing);
 }
+
+export async function GET(
+    request: Request,
+    { params }: { params: IParams }
+) {
+    try {
+        const { listingId } = params;
+
+        if (!listingId || typeof listingId !== 'string') {
+            return NextResponse.error();
+        }
+
+        const listing = await prisma.listing.findUnique({
+            where: {
+                id: listingId
+            },
+            include: {
+                user: true
+            }
+        });
+
+        if (!listing) {
+            return NextResponse.error();
+        }
+
+        return NextResponse.json({
+            ...listing,
+            createdAt: listing.createdAt.toISOString(),
+            user: {
+                ...listing.user,
+                createdAt: listing.user.createdAt.toISOString(),
+                updatedAt: listing.user.updatedAt.toISOString(),
+                emailVerified: listing.user.emailVerified?.toISOString() || null
+            }
+        });
+    } catch (error: any) {
+        console.error('Error fetching listing:', error);
+        return NextResponse.error();
+    }
+}
